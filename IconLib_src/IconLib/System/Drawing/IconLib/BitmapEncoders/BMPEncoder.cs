@@ -34,10 +34,7 @@ namespace System.Drawing.IconLib.BitmapEncoders
         #endregion
 
         #region Properties
-        public override IconImageFormat IconImageFormat
-        {
-            get {return IconImageFormat.BMP;}
-        }
+        public override IconImageFormat IconImageFormat => IconImageFormat.BMP;
         #endregion
 
         #region Methods
@@ -67,7 +64,7 @@ namespace System.Drawing.IconLib.BitmapEncoders
 
         public unsafe override void Write(Stream stream)
         {
-            BinaryReader br = new BinaryReader(stream);
+            // BinaryReader br = new BinaryReader(stream);
 
             // BitmapInfoHeader
             mHeader.Write(stream);

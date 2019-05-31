@@ -38,10 +38,7 @@ namespace System.Drawing.IconLib.BitmapEncoders
         #endregion
 
         #region Properties
-        public override IconImageFormat IconImageFormat
-        {
-            get {return IconImageFormat.PNG;}
-        }
+        public override IconImageFormat IconImageFormat => IconImageFormat.PNG;
 
         public override unsafe int ImageSize
         {
@@ -50,9 +47,13 @@ namespace System.Drawing.IconLib.BitmapEncoders
                 // This is a fast and temporary solution,
                 // Soon Ill implement a png cache, 
                 // then the image will be generated just once between calls and writes
-                MemoryStream ms = new MemoryStream();
-                Icon.ToBitmap().Save(ms, ImageFormat.Png);
-                return (int) ms.Length;
+                int length = 0;
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    Icon.ToBitmap().Save(ms, ImageFormat.Png);
+                    length = (int)ms.Length;
+                }
+                return length;
             }
         }
         #endregion
@@ -73,14 +74,14 @@ namespace System.Drawing.IconLib.BitmapEncoders
 
             //Transfer the data from the BMPEncoder to the PNGEncoder
             CopyFrom(iconImage.Encoder);
-         }
+        }
 
         public override void Write(Stream stream)
         {
             MemoryStream ms = new MemoryStream();
             Icon.ToBitmap().Save(ms, ImageFormat.Png);
             byte[] buffer = ms.GetBuffer();
-            stream.Write(buffer, 0, (int) ms.Length);
+            stream.Write(buffer, 0, (int)ms.Length);
         }
         #endregion
     }

@@ -227,10 +227,9 @@ namespace System.Drawing.IconLib.EncodingFormats
 
                     int id;
                     if (int.TryParse(singleIcon.Name, out id))
-                    {
                         // Write id as an integer
                         bResult = Win32.UpdateResource(updPtr, (int) ResourceType.RT_GROUP_ICON, (IntPtr) id, 0, buffer, (uint) ms.Length);
-                    }
+
                     else
                     {
                         // Write id as string
@@ -269,13 +268,11 @@ namespace System.Drawing.IconLib.EncodingFormats
         private static unsafe bool EnumResNameProc(IntPtr hModule, IntPtr pType, IntPtr pName, IntPtr param)
         {
             if (Win32.IS_INTRESOURCE(pName))
-            {
                 mIconsIDs.Add(pName.ToString()); 
-            }
+
             else
-            {
                 mIconsIDs.Add(Marshal.PtrToStringUni(pName)); 
-            }
+
             return true;
         }
         #endregion

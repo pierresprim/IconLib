@@ -306,13 +306,12 @@ namespace System.Drawing.IconLib.EncodingFormats
             {
                 bool found = false;
                 foreach(string name in names)
-                {
                     if (name.ToLower() == "icon " + index)
                     {
                         found = true;
                         break;
                     }
-                }
+
                 if (!found)
                     return "Icon " + index;
                 index++;

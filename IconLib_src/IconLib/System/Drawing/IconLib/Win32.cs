@@ -27,7 +27,7 @@ namespace System.Drawing.IconLib
     internal class Win32
     {
         #region DELEGATES
-        public delegate Int32 EnumResTypeProc(IntPtr hModule, IntPtr lpszType, IntPtr lParam);
+        public delegate int EnumResTypeProc(IntPtr hModule, IntPtr lpszType, IntPtr lParam);
         public delegate bool EnumResNameProc(IntPtr hModule, IntPtr pType, IntPtr pName, IntPtr param);
         #endregion
 
@@ -110,26 +110,15 @@ namespace System.Drawing.IconLib
         public static bool IS_INTRESOURCE(IntPtr value)
         {
 #if x86 || AnyCPU
-            if (((uint)value) > ushort.MaxValue)
-                    return false;
-                return true;
+            return ((uint)value) <= ushort.MaxValue;
 #elif x64
-            if (((ulong)value) > ushort.MaxValue)
-                return false;
-            return true;
+            return ((ulong)value) <= ushort.MaxValue;
 #endif
         }
 
-        public static bool IS_INTRESOURCE(string value)
-        {
-            int iResult;
-            return int.TryParse(value, out iResult);
-        }
+        public static bool IS_INTRESOURCE(string value) => int.TryParse(value, out int iResult);
 
-		public static int MAKEINTRESOURCE(int resource)
-		{
-			return 0x0000FFFF & resource;
-		}
-#endregion
+        public static int MAKEINTRESOURCE(int resource) => 0x0000FFFF & resource;
+        #endregion
     }
 }

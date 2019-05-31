@@ -39,10 +39,7 @@ namespace System.Drawing.IconLib
         {
         }
 
-        public MultiIcon(IEnumerable<SingleIcon> collection)
-        {
-            AddRange(collection);
-        }
+        public MultiIcon(IEnumerable<SingleIcon> collection) => AddRange(collection);
 
         public MultiIcon(SingleIcon singleIcon)
         {
@@ -54,11 +51,11 @@ namespace System.Drawing.IconLib
         #region Properties
         public int SelectedIndex
         {
-            get {return mSelectedIndex;}
+            get => mSelectedIndex;
             set
             {
                 if (value >= Count)
-                    throw new ArgumentOutOfRangeException("SelectedIndex");
+                    throw new ArgumentOutOfRangeException(nameof(SelectedIndex));
 
                 mSelectedIndex = value;
             }
@@ -76,7 +73,7 @@ namespace System.Drawing.IconLib
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException("SelectedName");
+                    throw new ArgumentNullException(nameof(SelectedName));
 
                 for(int i=0; i<Count; i++)
                     if (this[i].Name.ToLower() == value.ToLower())
@@ -85,7 +82,7 @@ namespace System.Drawing.IconLib
                         return;
                     }
 
-                throw new InvalidDataException("SelectedName does not exist.");
+                throw new InvalidDataException($"{nameof(SelectedName)} does not exist.");
             }
         }
 
@@ -124,14 +121,14 @@ namespace System.Drawing.IconLib
             // Lets Create the icon group
             // Add group to the master list and also lets give a name
             SingleIcon singleIcon = new SingleIcon(iconName);
-            this.Add(singleIcon);
+            Add(singleIcon);
             return singleIcon;
         }
 
         public void Remove(string iconName)
         {
             if (iconName == null)
-                throw new ArgumentNullException("iconName");
+                throw new ArgumentNullException(nameof(iconName));
 
             // If not exist then do nothing
             int index = IndexOf(iconName);
@@ -144,7 +141,7 @@ namespace System.Drawing.IconLib
         public bool Contains(string iconName)
         {
             if (iconName == null)
-                throw new ArgumentNullException("iconName");
+                throw new ArgumentNullException(nameof(iconName));
 
             // Exist?
             return IndexOf(iconName) != -1 ? true : false;
@@ -153,7 +150,7 @@ namespace System.Drawing.IconLib
         public int IndexOf(string iconName)
         {
             if (iconName == null)
-                throw new ArgumentNullException("iconName");
+                throw new ArgumentNullException(nameof(iconName));
 
             // Exist?
             for(int i=0; i<Count; i++)
@@ -181,11 +178,11 @@ namespace System.Drawing.IconLib
             ILibraryFormat baseFormat;
 
             if ((baseFormat = new IconFormat()).IsRecognizedFormat(stream))
-            {
+
                 if (mSelectedIndex == -1)
                 {
-                    this.Clear();
-                    this.Add(baseFormat.Load(stream)[0]);
+                    Clear();
+                    Add(baseFormat.Load(stream)[0]);
                     this[0].Name = "Untitled";
                 }
                 else
@@ -194,16 +191,17 @@ namespace System.Drawing.IconLib
                     this[mSelectedIndex] = baseFormat.Load(stream)[0];
                     this[mSelectedIndex].Name = currentName;
                 }
-            }
+
             else if ((baseFormat = new NEFormat()).IsRecognizedFormat(stream))
-            {
+
                 CopyFrom(baseFormat.Load(stream));
-            }
+
             else if ((baseFormat = new PEFormat()).IsRecognizedFormat(stream))
-            {
+
                 CopyFrom(baseFormat.Load(stream));
-            }
+
             else
+
                 throw new InvalidFileException();
 
             SelectedIndex = Count > 0 ? 0 : -1;

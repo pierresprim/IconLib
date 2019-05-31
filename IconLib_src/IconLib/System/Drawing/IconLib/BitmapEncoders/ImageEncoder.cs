@@ -28,10 +28,10 @@ namespace System.Drawing.IconLib.BitmapEncoders
     internal abstract class ImageEncoder
     {
         #region Variables Declaration
-        protected BITMAPINFOHEADER  mHeader;
-        protected RGBQUAD[]         mColors;
-        protected byte[]            mXOR;
-        protected byte[]            mAND;
+        protected BITMAPINFOHEADER mHeader;
+        protected RGBQUAD[] mColors;
+        protected byte[] mXOR;
+        protected byte[] mAND;
         #endregion
 
         #region Constructors
@@ -45,95 +45,87 @@ namespace System.Drawing.IconLib.BitmapEncoders
         {
             get
             {
-                MemoryStream ms = new MemoryStream();
+                using (MemoryStream ms = new MemoryStream())
+                {
 
-                // ICONDIR
-                ICONDIR iconDir = ICONDIR.Initalizated;
-                iconDir.idCount = 1;
-                iconDir.Write(ms);
+                    // ICONDIR
+                    ICONDIR iconDir = ICONDIR.Initalizated;
+                    iconDir.idCount = 1;
+                    iconDir.Write(ms);
 
-                // ICONDIRENTRY 
-                ICONDIRENTRY iconEntry = new ICONDIRENTRY();
-                iconEntry.bColorCount   = (byte) mHeader.biClrUsed;
-                iconEntry.bHeight       = (byte) (mHeader.biHeight / 2);
-                iconEntry.bReserved     = 0;
-                iconEntry.bWidth        = (byte) mHeader.biWidth;
-                iconEntry.dwBytesInRes  = (uint) (sizeof(BITMAPINFOHEADER) + 
-                                            sizeof(RGBQUAD) * ColorsInPalette + 
-                                            mXOR.Length + mAND.Length);
-                iconEntry.dwImageOffset = (uint) (sizeof(ICONDIR) + sizeof(ICONDIRENTRY));
-                iconEntry.wBitCount     = mHeader.biBitCount;
-                iconEntry.wPlanes       = mHeader.biPlanes;
-                iconEntry.Write(ms);
+                    // ICONDIRENTRY 
+                    ICONDIRENTRY iconEntry = new ICONDIRENTRY();
+                    iconEntry.bColorCount = (byte)mHeader.biClrUsed;
+                    iconEntry.bHeight = (byte)(mHeader.biHeight / 2);
+                    iconEntry.bReserved = 0;
+                    iconEntry.bWidth = (byte)mHeader.biWidth;
+                    iconEntry.dwBytesInRes = (uint)(sizeof(BITMAPINFOHEADER) +
+                                                sizeof(RGBQUAD) * ColorsInPalette +
+                                                mXOR.Length + mAND.Length);
+                    iconEntry.dwImageOffset = (uint)(sizeof(ICONDIR) + sizeof(ICONDIRENTRY));
+                    iconEntry.wBitCount = mHeader.biBitCount;
+                    iconEntry.wPlanes = mHeader.biPlanes;
+                    iconEntry.Write(ms);
 
-                // Image Info Header
-                ms.Seek(iconEntry.dwImageOffset, SeekOrigin.Begin);
-                mHeader.Write(ms);
+                    // Image Info Header
+                    ms.Seek(iconEntry.dwImageOffset, SeekOrigin.Begin);
+                    mHeader.Write(ms);
 
-                // Image Palette
-                byte[] buffer = new byte[sizeof(RGBQUAD) * ColorsInPalette];
-                GCHandle handle = GCHandle.Alloc(mColors, GCHandleType.Pinned);
-                Marshal.Copy(handle.AddrOfPinnedObject(), buffer, 0, buffer.Length);
-                handle.Free();
-                ms.Write(buffer, 0, buffer.Length);
+                    // Image Palette
+                    byte[] buffer = new byte[sizeof(RGBQUAD) * ColorsInPalette];
+                    GCHandle handle = GCHandle.Alloc(mColors, GCHandleType.Pinned);
+                    Marshal.Copy(handle.AddrOfPinnedObject(), buffer, 0, buffer.Length);
+                    handle.Free();
+                    ms.Write(buffer, 0, buffer.Length);
 
-                // Image XOR Image
-                ms.Write(mXOR, 0, mXOR.Length);
+                    // Image XOR Image
+                    ms.Write(mXOR, 0, mXOR.Length);
 
-                // Image AND Image
-                ms.Write(mAND, 0, mAND.Length);
+                    // Image AND Image
+                    ms.Write(mAND, 0, mAND.Length);
 
-                // Rewind the stream
-                ms.Position = 0;
-                Icon icon = new Icon(ms, iconEntry.bWidth, iconEntry.bHeight);
-                ms.Dispose();
-                return icon;
+                    // Rewind the stream
+                    ms.Position = 0;
+
+                   return new Icon(ms, iconEntry.bWidth, iconEntry.bHeight);
+                }
             }
         }
 
         public virtual BITMAPINFOHEADER Header
         {
-            get {return mHeader;}
-            set {mHeader = value;}
+            get => mHeader;
+            set => mHeader = value;
         }
 
         public virtual RGBQUAD[] Colors
         {
-            get {return mColors;}
-            set {mColors = value;}
+            get => mColors;
+            set => mColors = value;
         }
 
         public virtual byte[] XOR
         {
-            get {return mXOR;}
-            set 
+            get => mXOR;
+            set
             {
-                mHeader.biSizeImage = (uint) value.Length;
+                mHeader.biSizeImage = (uint)value.Length;
                 mXOR = value;
             }
         }
 
         public virtual byte[] AND
         {
-            get {return mAND;}
-            set {mAND = value;}
+            get => mAND;
+            set => mAND = value;
         }
 
-        public unsafe virtual int ColorsInPalette
-        {
-            get
-            {
-                return (int) (mHeader.biClrUsed != 0 ? 
-                                    mHeader.biClrUsed : 
-                                    mHeader.biBitCount <=8 ? 
-                                        (uint) (1 << mHeader.biBitCount) : 0);
-            }
-        }
+        public unsafe virtual int ColorsInPalette => (int)(mHeader.biClrUsed != 0 ?
+                                    mHeader.biClrUsed :
+                                    mHeader.biBitCount <= 8 ?
+                                        (uint)(1 << mHeader.biBitCount) : 0);
 
-        public unsafe virtual int ImageSize
-        {
-            get{return sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD) * ColorsInPalette + mXOR.Length + mAND.Length;}
-        }
+        public unsafe virtual int ImageSize => sizeof(BITMAPINFOHEADER) + (sizeof(RGBQUAD) * ColorsInPalette) + mXOR.Length + mAND.Length;
 
         public abstract IconImageFormat IconImageFormat
         {
@@ -149,10 +141,10 @@ namespace System.Drawing.IconLib.BitmapEncoders
         #region Methods
         public void CopyFrom(ImageEncoder encoder)
         {
-            this.mHeader    = encoder.mHeader;
-            this.mColors    = encoder.mColors;
-            this.mXOR       = encoder.mXOR;
-            this.mAND       = encoder.mAND;
+            mHeader = encoder.mHeader;
+            mColors = encoder.mColors;
+            mXOR = encoder.mXOR;
+            mAND = encoder.mAND;
         }
         #endregion
     }

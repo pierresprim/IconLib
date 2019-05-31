@@ -41,10 +41,7 @@ namespace System.Drawing.IconLib.ColorProcessing
 
         public EuclideanQuantizer(IPaletteQuantizer quantizer, IDithering dithering)
         {
-            if (quantizer == null)
-                throw new Exception("param 'quantizer' cannot be null");
-
-            mQuantizer  = quantizer;
+            mQuantizer = quantizer ?? throw new Exception("param 'quantizer' cannot be null");
             mDithering  = dithering;
         }
         #endregion
@@ -66,12 +63,11 @@ namespace System.Drawing.IconLib.ColorProcessing
             switch(outputFormat)
             {
                 case PixelFormat.Format1bppIndexed:
-                    Bitmap bmp = new Bitmap(1,1, PixelFormat.Format1bppIndexed);
-                    newPalette = bmp.Palette; 
-                    bmp.Dispose();
+                    using (Bitmap bmp = new Bitmap(1, 1, PixelFormat.Format1bppIndexed))
+                        newPalette = bmp.Palette;
 
-			        newPalette.Entries[0] = Color.FromArgb(255,0,0,0); 
-			        newPalette.Entries[1] = Color.FromArgb(255,255,255,255); 
+                    newPalette.Entries[0] = Color.FromArgb(255, 0, 0, 0);
+                    newPalette.Entries[1] = Color.FromArgb(255, 255, 255, 255);
                     break;
                 case PixelFormat.Format4bppIndexed:
                     newPalette = mQuantizer.CreatePalette(source, 16, 4);                
@@ -97,7 +93,7 @@ namespace System.Drawing.IconLib.ColorProcessing
                 byte* pixelTargetB;
                 int Width           = source.Width;
                 int Height          = source.Height;
-                byte bpp            = (byte) Bitmap.GetPixelFormatSize(source.PixelFormat);
+                byte bpp            = (byte)Image.GetPixelFormatSize(source.PixelFormat);
                 byte r              = 0;
                 byte g              = 0;
                 byte b              = 0;
@@ -130,18 +126,18 @@ namespace System.Drawing.IconLib.ColorProcessing
                             case PixelFormat.Format1bppIndexed:
 					            byte mask = (byte) (0x80 >> ((x - 1) & 0x7)); 
 					            if (index == 1) 
-						            *(pixelTargetB) |= mask; 
+						            *pixelTargetB |= mask; 
 					            else 
-						            *(pixelTargetB) &= (byte)(mask^0xff);
+						            *pixelTargetB &= (byte)(mask^0xff);
 
                                 pixelTargetB+= (x % 8) == 0 && x != 0 ? 1 : 0;
                                 break;
                             case PixelFormat.Format4bppIndexed:
-                                *(pixelTargetB) |= (byte) (index << (((x - 1) & 1) << 2));
+                                *pixelTargetB |= (byte) (index << (((x - 1) & 1) << 2));
                                 pixelTargetB+= (x & 1);
                                 break;
                             case PixelFormat.Format8bppIndexed:
-                                *(pixelTargetB) = index;
+                                *pixelTargetB = index;
                                 pixelTargetB++;
                                 break;
                         }
@@ -208,24 +204,24 @@ namespace System.Drawing.IconLib.ColorProcessing
             {
                 case 16:
                     pixelSourceBT = firstStridePixel + x * 2;
-                    r = (byte) ((*((ushort*) pixelSourceBT) & 0x7C00) >> 7);
-                    g = (byte) ((*((ushort*) pixelSourceBT) & 0x03E0) >> 2);
-                    b = (byte) ((*((ushort*) pixelSourceBT) & 0x001F) << 3);
-                    ARGBColor = *((ushort*) (pixelSourceBT));
+                    r = (byte) ((*(ushort*) pixelSourceBT & 0x7C00) >> 7);
+                    g = (byte)((*(ushort*)pixelSourceBT & 0x03E0) >> 2);
+                    b = (byte) ((*(ushort*) pixelSourceBT & 0x001F) << 3);
+                    ARGBColor = *(ushort*) (pixelSourceBT);
                     break;
                 case 24:
                     pixelSourceBT = firstStridePixel + x * 3;
-                    r = *((byte*) pixelSourceBT + 2);
-                    g = *((byte*) pixelSourceBT + 1);
-                    b = *((byte*) pixelSourceBT + 0);
+                    r = *(pixelSourceBT + 2);
+                    g = *(pixelSourceBT + 1);
+                    b = *(pixelSourceBT + 0);
                     ARGBColor = (uint) (r << 16 | g << 8 | b);
                     break;
                 case 32:
                     pixelSourceBT = firstStridePixel + x * 4;
-                    r = *((byte*) pixelSourceBT + 2);
-                    g = *((byte*) pixelSourceBT + 1);
-                    b = *((byte*) pixelSourceBT + 0);
-                    ARGBColor = *((uint*) (pixelSourceBT));
+                    r = *(pixelSourceBT + 2);
+                    g = *(pixelSourceBT + 1);
+                    b = *(pixelSourceBT + 0);
+                    ARGBColor = *(uint*) (pixelSourceBT);
                     break;
             }
         }

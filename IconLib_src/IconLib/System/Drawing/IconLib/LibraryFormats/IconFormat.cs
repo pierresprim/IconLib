@@ -53,10 +53,7 @@ namespace System.Drawing.IconLib.EncodingFormats
             stream.Position = 0;
             SingleIcon singleIcon = new SingleIcon("Untitled");
             ICONDIR iconDir = new ICONDIR(stream);
-            if (iconDir.idReserved != 0)
-                throw new InvalidMultiIconFileException();
-
-            if (iconDir.idType != 1)
+            if (iconDir.idReserved != 0 || iconDir.idType != 1)
                 throw new InvalidMultiIconFileException();
 
             int entryOffset = sizeof(ICONDIR);
@@ -137,7 +134,7 @@ namespace System.Drawing.IconLib.EncodingFormats
                 {
                     stride   = ((entry.bWidth * bpp[j] + 31) & ~31) >> 3;
                     CLSSize  = entry.bHeight * stride ;
-                    palette  = bpp[j]<=8 ? ((int) (1 << bpp[j]) * 4) : 0;
+                    palette  = bpp[j]<=8 ? ((1 << bpp[j]) * 4) : 0;
                     if (palette + CLSSize == bmpSize)
                     {
                         entry.wBitCount = bpp[j];

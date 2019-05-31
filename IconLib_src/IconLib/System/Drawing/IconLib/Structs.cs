@@ -116,7 +116,7 @@ namespace System.Drawing.IconLib
         public IMAGE_DOS_HEADER(Stream stream)
         {
             this = new IMAGE_DOS_HEADER();
-            this.Read(stream);
+            Read(stream);
         }
         #endregion
 
@@ -240,7 +240,7 @@ namespace System.Drawing.IconLib
         public IMAGE_NT_HEADERS(Stream stream)
         {
             this = new IMAGE_NT_HEADERS();
-            this.Read(stream);
+            Read(stream);
         }
         #endregion
 
@@ -304,7 +304,7 @@ namespace System.Drawing.IconLib
         public IMAGE_OS2_HEADER(Stream stream)
         {
             this = new IMAGE_OS2_HEADER();
-            this.Read(stream);
+            Read(stream);
         }
         #endregion
 
@@ -344,7 +344,7 @@ namespace System.Drawing.IconLib
         public RESOURCE_TABLE(Stream stream)
         {
             this = new RESOURCE_TABLE();
-            this.Read(stream);
+            Read(stream);
         }
         #endregion
 
@@ -546,23 +546,23 @@ namespace System.Drawing.IconLib
     [Author("Franco, Gustavo")]
     internal unsafe struct BITMAPINFOHEADER
     {
-	    public UInt32		    biSize;
-	    public UInt32		    biWidth;
-	    public UInt32		    biHeight;
-	    public UInt16		    biPlanes;
-	    public UInt16		    biBitCount;
+	    public uint biSize;
+	    public uint biWidth;
+	    public uint biHeight;
+	    public ushort biPlanes;
+	    public ushort biBitCount;
 	    public IconImageFormat  biCompression;
-	    public UInt32		    biSizeImage;
-	    public Int32	        biXPelsPerMeter;
-	    public Int32		    biYPelsPerMeter;
-	    public UInt32		    biClrUsed;
-	    public UInt32		    biClrImportant;
+	    public uint biSizeImage;
+	    public int biXPelsPerMeter;
+	    public int biYPelsPerMeter;
+	    public uint biClrUsed;
+	    public uint biClrImportant;
 
         #region Constructors
         public BITMAPINFOHEADER(Stream stream)
         {
             this = new BITMAPINFOHEADER();
-            this.Read(stream);
+            Read(stream);
         }
         #endregion
 
@@ -600,15 +600,12 @@ namespace System.Drawing.IconLib
         public TYPEINFO(Stream stream)
         {
             this = new TYPEINFO();
-            this.Read(stream);
+            Read(stream);
         }
         #endregion
 
         #region Properties
-        public ResourceType ResourceType
-        {
-            get { return (ResourceType) (rtTypeID & 0xFF);}
-        }
+        public ResourceType ResourceType => (ResourceType)(rtTypeID & 0xFF);
         #endregion
 
         #region Methods
@@ -656,20 +653,14 @@ namespace System.Drawing.IconLib
         public TNAMEINFO(Stream stream)
         {
             this = new TNAMEINFO();
-            this.Read(stream);
+            Read(stream);
         }
         #endregion
 
         #region Properties
-        public ushort ID
-        {
-            get { return (ushort) rnID > 0x8000 ? (ushort) (rnID & ~0x8000) : rnID;}
-        }
+        public ushort ID => rnID > 0x8000 ? (ushort)(rnID & ~0x8000) : rnID;
 
-        public ResourceMemoryType ResourceMemoryType
-        {
-            get { return (ResourceMemoryType) rnFlags; }
-        }
+        public ResourceMemoryType ResourceMemoryType => (ResourceMemoryType)rnFlags;
         #endregion
 
         #region Methods
@@ -697,12 +688,12 @@ namespace System.Drawing.IconLib
     [Author("Franco, Gustavo")]
     internal unsafe struct ICONDIR
     {
-        public UInt16 idReserved;
-        public UInt16 idType;
-        public UInt16 idCount;
+        public ushort idReserved;
+        public ushort idType;
+        public ushort idCount;
 
         #region Constructors
-        public ICONDIR(UInt16 reserved, UInt16 type, UInt16 count)
+        public ICONDIR(ushort reserved, ushort type, ushort count)
         {
             idReserved  = reserved;
             idType      = type;
@@ -712,15 +703,12 @@ namespace System.Drawing.IconLib
         public ICONDIR(Stream stream)
         {
             this = new ICONDIR();
-            this.Read(stream);
+            Read(stream);
         }
         #endregion
 
         #region Properties
-        public static ICONDIR Initalizated
-        {
-            get {return new ICONDIR(0, 1, 0);}
-        }
+        public static ICONDIR Initalizated => new ICONDIR(0, 1, 0);
         #endregion
 
         #region Methods
@@ -775,13 +763,13 @@ namespace System.Drawing.IconLib
     [Author("Franco, Gustavo")]
     internal unsafe struct GRPICONDIR
     {
-        public UInt16               idReserved;
-        public UInt16               idType;
-        public UInt16               idCount;
+        public ushort idReserved;
+        public ushort idType;
+        public ushort idCount;
         public GRPICONDIRENTRY[]    idEntries;  
 
         #region Constructors
-        public GRPICONDIR(UInt16 reserved, UInt16 type, UInt16 count)
+        public GRPICONDIR(ushort reserved, ushort type, ushort count)
         {
             idReserved  = reserved;
             idType      = type;
@@ -792,20 +780,14 @@ namespace System.Drawing.IconLib
         public GRPICONDIR(Stream stream)
         {
             this = new GRPICONDIR();
-            this.Read(stream);
+            Read(stream);
         }
         #endregion
 
         #region Properties
-        public static GRPICONDIR Initalizated
-        {
-            get {return new GRPICONDIR(0, 1, 0);}
-        }
+        public static GRPICONDIR Initalizated => new GRPICONDIR(0, 1, 0);
 
-        public int GroupDirSize
-        {
-            get {return 6 + idEntries.Length * sizeof(GRPICONDIRENTRY);}
-        }
+        public int GroupDirSize => 6 + (idEntries.Length * sizeof(GRPICONDIRENTRY));
         #endregion
 
         #region Methods
@@ -851,7 +833,7 @@ namespace System.Drawing.IconLib
         public ICONDIRENTRY(Stream stream)
         {
             this = new ICONDIRENTRY();
-            this.Read(stream);
+            Read(stream);
         }
         #endregion
 
@@ -907,7 +889,7 @@ namespace System.Drawing.IconLib
         public GRPICONDIRENTRY(Stream stream)
         {
             this = new GRPICONDIRENTRY();
-            this.Read(stream);
+            Read(stream);
         }
         #endregion
 
@@ -931,13 +913,13 @@ namespace System.Drawing.IconLib
         public ICONDIRENTRY ToIconDirEntry()
         {
             ICONDIRENTRY iconDirEntry = new ICONDIRENTRY();
-            iconDirEntry.bColorCount    = this.bColorCount;
-            iconDirEntry.bHeight        = this.bHeight;
-            iconDirEntry.bReserved      = this.bReserved;
-            iconDirEntry.bWidth         = this.bWidth;
-            iconDirEntry.dwBytesInRes   = this.dwBytesInRes;
-            iconDirEntry.wBitCount      = this.wBitCount;
-            iconDirEntry.wPlanes        = this.wPlanes;
+            iconDirEntry.bColorCount    = bColorCount;
+            iconDirEntry.bHeight        = bHeight;
+            iconDirEntry.bReserved      = bReserved;
+            iconDirEntry.bWidth         = bWidth;
+            iconDirEntry.dwBytesInRes   = dwBytesInRes;
+            iconDirEntry.wBitCount      = wBitCount;
+            iconDirEntry.wPlanes        = wPlanes;
             return iconDirEntry;
         }
         #endregion

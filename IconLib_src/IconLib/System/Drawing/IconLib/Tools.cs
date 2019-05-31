@@ -29,10 +29,7 @@ namespace System.Drawing.IconLib
     internal static class Tools
     {
         #region Methods
-        public static bool CompareRGBQUADToColor(RGBQUAD rgbQuad, Color color)
-        {
-            return rgbQuad.rgbRed == color.R && rgbQuad.rgbGreen == color.G && rgbQuad.rgbBlue == color.B;
-        }
+        public static bool CompareRGBQUADToColor(RGBQUAD rgbQuad, Color color) => rgbQuad.rgbRed == color.R && rgbQuad.rgbGreen == color.G && rgbQuad.rgbBlue == color.B;
 
         public static unsafe void FlipYBitmap(Bitmap bitmap)
         {
@@ -40,29 +37,28 @@ namespace System.Drawing.IconLib
                 return;
 
             // .Net bug.. it can't flip in the Y axis a 1bpp properly
-            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0,0,bitmap.Width, bitmap.Height) , ImageLockMode.ReadWrite, PixelFormat.Format1bppIndexed);
+            BitmapData bitmapData = bitmap.LockBits(new Rectangle(0, 0, bitmap.Width, bitmap.Height), ImageLockMode.ReadWrite, PixelFormat.Format1bppIndexed);
 
-			byte* pixelPtr = (byte*)bitmapData.Scan0.ToPointer();
-			byte[] tmpbuffer = new byte[bitmapData.Stride];
+            byte* pixelPtr = (byte*)bitmapData.Scan0.ToPointer();
+            byte[] tmpbuffer = new byte[bitmapData.Stride];
 
-			fixed (byte* lptmpbuffer = tmpbuffer)
-			{
-				for (int i=0; i<bitmap.Height / 2; i++)
-				{
-					Win32.CopyMemory(lptmpbuffer, pixelPtr + (i * bitmapData.Stride), bitmapData.Stride);
-					Win32.CopyMemory(pixelPtr + (i * bitmapData.Stride), pixelPtr + (((bitmap.Height - 1) - i) * bitmapData.Stride), bitmapData.Stride);
-					Win32.CopyMemory(pixelPtr + (((bitmap.Height - 1) - i) * bitmapData.Stride), lptmpbuffer, bitmapData.Stride);
+            fixed (byte* lptmpbuffer = tmpbuffer)
 
-				}
-			}
+                for (int i = 0; i < bitmap.Height / 2; i++)
+                {
+                    Win32.CopyMemory(lptmpbuffer, pixelPtr + (i * bitmapData.Stride), bitmapData.Stride);
+                    Win32.CopyMemory(pixelPtr + (i * bitmapData.Stride), pixelPtr + (((bitmap.Height - 1) - i) * bitmapData.Stride), bitmapData.Stride);
+                    Win32.CopyMemory(pixelPtr + (((bitmap.Height - 1) - i) * bitmapData.Stride), lptmpbuffer, bitmapData.Stride);
 
-			bitmap.UnlockBits(bitmapData);
+                }
+
+            bitmap.UnlockBits(bitmapData);
         }
 
         public static RGBQUAD[] StandarizePalette(RGBQUAD[] palette)
         {
             RGBQUAD[] newPalette = new RGBQUAD[256];
-            for(int i=0; i<palette.Length; i++)
+            for (int i = 0; i < palette.Length; i++)
                 newPalette[i] = palette[i];
 
             return newPalette;
@@ -74,10 +70,10 @@ namespace System.Drawing.IconLib
             int bits = Tools.BitsFromPixelFormat(bmp.PixelFormat);
             RGBQUAD[] rgbArray = new RGBQUAD[bits <= 8 ? (1 << bits) : 0];
             Color[] entries = bmp.Palette.Entries;
-            for(int i=0; i<entries.Length; i++)
+            for (int i = 0; i < entries.Length; i++)
             {
-                rgbArray[i].rgbRed  = entries[i].R;
-                rgbArray[i].rgbGreen= entries[i].G;
+                rgbArray[i].rgbRed = entries[i].R;
+                rgbArray[i].rgbGreen = entries[i].G;
                 rgbArray[i].rgbBlue = entries[i].B;
             }
             return rgbArray;

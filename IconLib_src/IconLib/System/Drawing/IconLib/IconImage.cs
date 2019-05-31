@@ -31,44 +31,25 @@ namespace System.Drawing.IconLib
     [Author("Franco, Gustavo")]
     public sealed class IconImage
     {
-        #region Variables Declaration
-        private ImageEncoder mEncoder;
-        #endregion
-
         #region Constructors
-        internal IconImage()
-        {
-            mEncoder = new BMPEncoder();
-        }
+        internal IconImage() => Encoder = new BMPEncoder();
 
-        internal IconImage(Stream stream, int resourceSize)
-        {
-            Read(stream, resourceSize);
-        }
+        internal IconImage(Stream stream, int resourceSize) => Read(stream, resourceSize);
         #endregion
 
         #region Properties
-        public unsafe int ColorsInPalette
-        {
-            get
-            {
-                return (int) (mEncoder.Header.biClrUsed != 0 ? 
-                                    mEncoder.Header.biClrUsed : 
-                                    mEncoder.Header.biBitCount <=8 ? 
-                                        (uint) (1 << mEncoder.Header.biBitCount) : 0);
-            }
-        }
+        public unsafe int ColorsInPalette => (int)(Encoder.Header.biClrUsed != 0 ?
+                                    Encoder.Header.biClrUsed :
+                                    Encoder.Header.biBitCount <= 8 ?
+                                        (uint)(1 << Encoder.Header.biBitCount) : 0);
 
-        public Size Size
-        {
-            get {return new Size((int) mEncoder.Header.biWidth, (int) (mEncoder.Header.biHeight / 2));}
-        }
+        public Size Size => new Size((int)Encoder.Header.biWidth, (int)(Encoder.Header.biHeight / 2));
 
         public PixelFormat PixelFormat
         {
             get
             {
-                switch (mEncoder.Header.biBitCount)
+                switch (Encoder.Header.biBitCount)
                 {
                     case 1:
                         return PixelFormat.Format1bppIndexed;
@@ -88,15 +69,9 @@ namespace System.Drawing.IconLib
             }
         }
 
-        public Icon Icon
-        {
-            get {return mEncoder.Icon;}
-        }
+        public Icon Icon => Encoder.Icon;
 
-        public unsafe Bitmap Transparent
-        {
-            get {return Icon.ToBitmap();}
-        }
+        public unsafe Bitmap Transparent => Icon.ToBitmap();
 
         public Bitmap Image
         {
@@ -107,18 +82,18 @@ namespace System.Drawing.IconLib
                 // Image
                 BITMAPINFO bitmapInfo;
                 IntPtr bits;
-                bitmapInfo.icHeader             = mEncoder.Header;
-                bitmapInfo.icHeader.biHeight   /= 2;
-                bitmapInfo.icColors             = Tools.StandarizePalette(mEncoder.Colors);
-                IntPtr hDCScreenOUTBmp          = Win32.CreateCompatibleDC(hDCScreen);
-                IntPtr hBitmapOUTBmp            = Win32.CreateDIBSection(hDCScreenOUTBmp, ref bitmapInfo, 0, out bits, IntPtr.Zero, 0);
-                Marshal.Copy(mEncoder.XOR, 0, bits, mEncoder.XOR.Length);
+                bitmapInfo.icHeader = Encoder.Header;
+                bitmapInfo.icHeader.biHeight /= 2;
+                bitmapInfo.icColors = Tools.StandarizePalette(Encoder.Colors);
+                IntPtr hDCScreenOUTBmp = Win32.CreateCompatibleDC(hDCScreen);
+                IntPtr hBitmapOUTBmp = Win32.CreateDIBSection(hDCScreenOUTBmp, ref bitmapInfo, 0, out bits, IntPtr.Zero, 0);
+                Marshal.Copy(Encoder.XOR, 0, bits, Encoder.XOR.Length);
                 Bitmap OutputBmp = Bitmap.FromHbitmap(hBitmapOUTBmp);
 
                 Win32.ReleaseDC(IntPtr.Zero, hDCScreen);
                 Win32.DeleteObject(hBitmapOUTBmp);
                 Win32.DeleteDC(hDCScreenOUTBmp);
-                
+
                 //// GDI+ returns a PixelFormat.Format32bppRgb for 32bits objects, 
                 //// we have to recreate it to PixelFormat.Format32bppARgb
                 //if (OutputBmp.PixelFormat == PixelFormat.Format32bppRgb)
@@ -145,15 +120,15 @@ namespace System.Drawing.IconLib
                 // Image
                 BITMAPINFO bitmapInfo;
                 IntPtr bits;
-                bitmapInfo.icHeader             = mEncoder.Header;
-                bitmapInfo.icHeader.biHeight   /= 2;
-                bitmapInfo.icHeader.biBitCount  = 1;
-                bitmapInfo.icColors             = new RGBQUAD[256];
+                bitmapInfo.icHeader = Encoder.Header;
+                bitmapInfo.icHeader.biHeight /= 2;
+                bitmapInfo.icHeader.biBitCount = 1;
+                bitmapInfo.icColors = new RGBQUAD[256];
                 bitmapInfo.icColors[0].Set(0, 0, 0);
                 bitmapInfo.icColors[1].Set(255, 255, 255);
-                IntPtr hDCScreenOUTBmp          = Win32.CreateCompatibleDC(hDCScreen);
-                IntPtr hBitmapOUTBmp            = Win32.CreateDIBSection(hDCScreenOUTBmp, ref bitmapInfo, 0, out bits, IntPtr.Zero, 0);
-                Marshal.Copy(mEncoder.AND, 0, bits, mEncoder.AND.Length);
+                IntPtr hDCScreenOUTBmp = Win32.CreateCompatibleDC(hDCScreen);
+                IntPtr hBitmapOUTBmp = Win32.CreateDIBSection(hDCScreenOUTBmp, ref bitmapInfo, 0, out bits, IntPtr.Zero, 0);
+                Marshal.Copy(Encoder.AND, 0, bits, Encoder.AND.Length);
                 Bitmap OutputBmp = Bitmap.FromHbitmap(hBitmapOUTBmp);
 
                 Win32.ReleaseDC(IntPtr.Zero, hDCScreen);
@@ -166,17 +141,17 @@ namespace System.Drawing.IconLib
 
         public IconImageFormat IconImageFormat
         {
-            get {return mEncoder.IconImageFormat;}
+            get => Encoder.IconImageFormat;
             set
             {
                 if (value == IconImageFormat.UNKNOWN)
                     throw new InvalidIconFormatSelectionException();
-                
-                if (value == mEncoder.IconImageFormat)
+
+                if (value == Encoder.IconImageFormat)
                     return;
 
                 ImageEncoder newEncoder = null;
-                switch(value)
+                switch (value)
                 {
                     case IconImageFormat.BMP:
                         newEncoder = new BMPEncoder();
@@ -185,55 +160,49 @@ namespace System.Drawing.IconLib
                         newEncoder = new PNGEncoder();
                         break;
                 }
-                newEncoder.CopyFrom(mEncoder);
-                mEncoder = newEncoder;
+                newEncoder.CopyFrom(Encoder);
+                Encoder = newEncoder;
             }
         }
         #endregion
 
         #region Internal Properties
-        internal ImageEncoder Encoder
-        {
-            get {return mEncoder;}
-        }
+        internal ImageEncoder Encoder { get; private set; }
 
-        internal unsafe int IconImageSize
-        {
-            get {return mEncoder.ImageSize;}
-        }
+        internal unsafe int IconImageSize => Encoder.ImageSize;
 
         internal unsafe ICONDIRENTRY ICONDIRENTRY
         {
-            get 
+            get
             {
                 ICONDIRENTRY iconDirEntry;
-                iconDirEntry.bColorCount    = (byte) mEncoder.Header.biClrUsed;
-                iconDirEntry.bHeight        = (byte) mEncoder.Header.biHeight;
-                iconDirEntry.bReserved      = 0;
-                iconDirEntry.bWidth         = (byte) mEncoder.Header.biWidth;
-                iconDirEntry.dwBytesInRes   = (uint) (sizeof(BITMAPINFOHEADER) + 
-                                                sizeof(RGBQUAD) * ColorsInPalette + 
-                                                mEncoder.XOR.Length + mEncoder.AND.Length);
-                iconDirEntry.dwImageOffset  = 0;
-                iconDirEntry.wBitCount      = mEncoder.Header.biBitCount;
-                iconDirEntry.wPlanes        = mEncoder.Header.biPlanes;
+                iconDirEntry.bColorCount = (byte)Encoder.Header.biClrUsed;
+                iconDirEntry.bHeight = (byte)Encoder.Header.biHeight;
+                iconDirEntry.bReserved = 0;
+                iconDirEntry.bWidth = (byte)Encoder.Header.biWidth;
+                iconDirEntry.dwBytesInRes = (uint)(sizeof(BITMAPINFOHEADER) +
+                                                sizeof(RGBQUAD) * ColorsInPalette +
+                                                Encoder.XOR.Length + Encoder.AND.Length);
+                iconDirEntry.dwImageOffset = 0;
+                iconDirEntry.wBitCount = Encoder.Header.biBitCount;
+                iconDirEntry.wPlanes = Encoder.Header.biPlanes;
                 return iconDirEntry;
             }
         }
 
         internal unsafe GRPICONDIRENTRY GRPICONDIRENTRY
         {
-            get 
+            get
             {
                 GRPICONDIRENTRY groupIconDirEntry;
-                groupIconDirEntry.bColorCount    = (byte) mEncoder.Header.biClrUsed;
-                groupIconDirEntry.bHeight        = (byte) mEncoder.Header.biHeight;
-                groupIconDirEntry.bReserved      = 0;
-                groupIconDirEntry.bWidth         = (byte) mEncoder.Header.biWidth;
-                groupIconDirEntry.dwBytesInRes   = (uint) IconImageSize;
-                groupIconDirEntry.nID            = 0;
-                groupIconDirEntry.wBitCount      = mEncoder.Header.biBitCount;
-                groupIconDirEntry.wPlanes        = mEncoder.Header.biPlanes;
+                groupIconDirEntry.bColorCount = (byte)Encoder.Header.biClrUsed;
+                groupIconDirEntry.bHeight = (byte)Encoder.Header.biHeight;
+                groupIconDirEntry.bReserved = 0;
+                groupIconDirEntry.bWidth = (byte)Encoder.Header.biWidth;
+                groupIconDirEntry.dwBytesInRes = (uint)IconImageSize;
+                groupIconDirEntry.nID = 0;
+                groupIconDirEntry.wBitCount = Encoder.Header.biBitCount;
+                groupIconDirEntry.wPlanes = Encoder.Header.biPlanes;
                 return groupIconDirEntry;
             }
         }
@@ -243,8 +212,8 @@ namespace System.Drawing.IconLib
         public unsafe void Set(Bitmap bitmap, Bitmap bitmapMask, Color transparentColor)
         {
             // We need to rotate the images, but we don't want to mess with the source image, lets create a clone
-            Bitmap image = (Bitmap) bitmap.Clone();
-            Bitmap mask  = bitmapMask != null ? (Bitmap) bitmapMask.Clone() : null;
+            Bitmap image = (Bitmap)bitmap.Clone();
+            Bitmap mask = bitmapMask != null ? (Bitmap)bitmapMask.Clone() : null;
             try
             {
                 //.NET has a bug flipping in the Y axis for 1bpp images, let do it ourself
@@ -264,42 +233,42 @@ namespace System.Drawing.IconLib
                 RGBQUAD[] palette = Tools.RGBQUADFromColorArray(image);
 
                 // Bitmap Header
-                BITMAPINFOHEADER infoHeader= new BITMAPINFOHEADER();
-                infoHeader.biSize           = (uint) sizeof(BITMAPINFOHEADER);
-                infoHeader.biWidth          = (uint) image.Width;
-                infoHeader.biHeight         = (uint) image.Height * 2;
-                infoHeader.biPlanes         = 1;
-                infoHeader.biBitCount       = (ushort) Tools.BitsFromPixelFormat(image.PixelFormat);
-                infoHeader.biCompression    = IconImageFormat.BMP;
-                infoHeader.biXPelsPerMeter  = 0;
-                infoHeader.biYPelsPerMeter  = 0;
-                infoHeader.biClrUsed        = (uint) palette.Length;
-                infoHeader.biClrImportant   = 0;
+                BITMAPINFOHEADER infoHeader = new BITMAPINFOHEADER();
+                infoHeader.biSize = (uint)sizeof(BITMAPINFOHEADER);
+                infoHeader.biWidth = (uint)image.Width;
+                infoHeader.biHeight = (uint)image.Height * 2;
+                infoHeader.biPlanes = 1;
+                infoHeader.biBitCount = (ushort)Tools.BitsFromPixelFormat(image.PixelFormat);
+                infoHeader.biCompression = IconImageFormat.BMP;
+                infoHeader.biXPelsPerMeter = 0;
+                infoHeader.biYPelsPerMeter = 0;
+                infoHeader.biClrUsed = (uint)palette.Length;
+                infoHeader.biClrImportant = 0;
 
                 // IconImage
-                mEncoder.Header  = infoHeader;
-                mEncoder.Colors  = palette;
+                Encoder.Header = infoHeader;
+                Encoder.Colors = palette;
 
                 // XOR Image
-                BitmapData bmpData = image.LockBits(new Rectangle(0,0, image.Width, image.Height), ImageLockMode.ReadOnly, image.PixelFormat);
-                IntPtr scanColor= bmpData.Scan0;
-                mEncoder.XOR = new byte[Math.Abs(bmpData.Stride) * bmpData.Height];
-                Marshal.Copy(scanColor, mEncoder.XOR, 0, mEncoder.XOR.Length);
+                BitmapData bmpData = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadOnly, image.PixelFormat);
+                IntPtr scanColor = bmpData.Scan0;
+                Encoder.XOR = new byte[Math.Abs(bmpData.Stride) * bmpData.Height];
+                Marshal.Copy(scanColor, Encoder.XOR, 0, Encoder.XOR.Length);
                 image.UnlockBits(bmpData);
-                infoHeader.biSizeImage = (uint) mEncoder.XOR.Length;
+                infoHeader.biSizeImage = (uint)Encoder.XOR.Length;
 
                 // AND Image
                 if (mask == null)
                 {
                     // Lets create the AND Image from the Color Image
                     Bitmap bmpBW = new Bitmap(image.Width, image.Height, PixelFormat.Format1bppIndexed);
-                    BitmapData bmpBWData = bmpBW.LockBits(new Rectangle(0,0, image.Width, image.Height), ImageLockMode.ReadWrite, bmpBW.PixelFormat);
-                    IntPtr scanBW   = bmpBWData.Scan0;
-                    mEncoder.AND = new byte[Math.Abs(bmpBWData.Stride) * bmpBWData.Height];
+                    BitmapData bmpBWData = bmpBW.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadWrite, bmpBW.PixelFormat);
+                    IntPtr scanBW = bmpBWData.Scan0;
+                    Encoder.AND = new byte[Math.Abs(bmpBWData.Stride) * bmpBWData.Height];
 
                     //Let extract the AND image from the XOR image
-                    int strideC =Math.Abs(bmpData.Stride);
-                    int strideB =Math.Abs(bmpBWData.Stride);
+                    int strideC = Math.Abs(bmpData.Stride);
+                    int strideB = Math.Abs(bmpBWData.Stride);
                     int bpp = Tools.BitsFromPixelFormat(image.PixelFormat);
                     int posCY;
                     int posCX;
@@ -312,67 +281,63 @@ namespace System.Drawing.IconLib
                     if (bpp == 24)
                         transparentColor = Color.FromArgb(0, transparentColor.R, transparentColor.G, transparentColor.B);
 
-                    for(int y=0;y<bmpData.Height; y++)
+                    for (int y = 0; y < bmpData.Height; y++)
                     {
                         posBY = strideB * y;
                         posCY = strideC * y;
-                        for(int x=0;x<bmpData.Width; x++)
+                        for (int x = 0; x < bmpData.Width; x++)
                         {
                             switch (bpp)
                             {
                                 case 1:
-                                    mEncoder.AND[(x >> 3) + posCY] = (byte) mEncoder.XOR[(x >> 3) + posCY];
+                                    Encoder.AND[(x >> 3) + posCY] = (byte)Encoder.XOR[(x >> 3) + posCY];
                                     break;
                                 case 4:
-                                    color = mEncoder.XOR[(x >> 1) + posCY];
-                                    paletteColor = mEncoder.Colors[(x & 1) == 0 ? color >> 4 : color & 0x0F];
-                                    if (Tools.CompareRGBQUADToColor(paletteColor , transparentColor))
+                                    color = Encoder.XOR[(x >> 1) + posCY];
+                                    paletteColor = Encoder.Colors[(x & 1) == 0 ? color >> 4 : color & 0x0F];
+                                    if (Tools.CompareRGBQUADToColor(paletteColor, transparentColor))
                                     {
-                                        mEncoder.AND[(x >> 3) + posBY] |= (byte) (0x80 >> (x & 7));
-                                        mEncoder.XOR[(x >> 1) + posCY] &= (byte) ((x & 1) == 0 ? 0x0F : 0xF0);
+                                        Encoder.AND[(x >> 3) + posBY] |= (byte)(0x80 >> (x & 7));
+                                        Encoder.XOR[(x >> 1) + posCY] &= (byte)((x & 1) == 0 ? 0x0F : 0xF0);
                                     }
                                     break;
                                 case 8:
-                                    color = mEncoder.XOR[x + posCY];
-                                    paletteColor = mEncoder.Colors[color];
-                                    if (Tools.CompareRGBQUADToColor(paletteColor , transparentColor))
+                                    color = Encoder.XOR[x + posCY];
+                                    paletteColor = Encoder.Colors[color];
+                                    if (Tools.CompareRGBQUADToColor(paletteColor, transparentColor))
                                     {
-                                        mEncoder.AND[(x >> 3) + posBY] |= (byte) (0x80 >> (x & 7));
-                                        mEncoder.XOR[x + posCY] = 0;
+                                        Encoder.AND[(x >> 3) + posBY] |= (byte)(0x80 >> (x & 7));
+                                        Encoder.XOR[x + posCY] = 0;
                                     }
                                     break;
-                                case 16: 
+                                case 16:
                                     throw new NotSupportedException("16 bpp images are not supported for Icons");
                                 case 24:
                                     posCX = x * 3;
-                                    tColor = Color.FromArgb(0, mEncoder.XOR[posCX + posCY + 0],
-                                                                mEncoder.XOR[posCX + posCY + 1],
-                                                                mEncoder.XOR[posCX + posCY + 2]);
+                                    tColor = Color.FromArgb(0, Encoder.XOR[posCX + posCY + 0],
+                                                                Encoder.XOR[posCX + posCY + 1],
+                                                                Encoder.XOR[posCX + posCY + 2]);
                                     if (tColor == transparentColor)
-                                        mEncoder.AND[(x >> 3) + posBY] |= (byte) (0x80 >> (x & 7));
+                                        Encoder.AND[(x >> 3) + posBY] |= (byte)(0x80 >> (x & 7));
                                     break;
                                 case 32:
                                     if (transparentColor == Color.Transparent)
                                     {
-                                        if (mEncoder.XOR[(x << 2) + posCY + 3] == 0)
-                                            mEncoder.AND[(x >> 3) + posBY] |= (byte) (0x80 >> (x & 7));
+                                        if (Encoder.XOR[(x << 2) + posCY + 3] == 0)
+                                            Encoder.AND[(x >> 3) + posBY] |= (byte)(0x80 >> (x & 7));
+                                    }
+                                    else if (Encoder.XOR[(x << 2) + posCY + 0] == transparentColor.B &&
+     Encoder.XOR[(x << 2) + posCY + 1] == transparentColor.G &&
+     Encoder.XOR[(x << 2) + posCY + 2] == transparentColor.R)
+                                    {
+                                        Encoder.AND[(x >> 3) + posBY] |= (byte)(0x80 >> (x & 7));
+                                        Encoder.XOR[(x << 2) + posCY + 0] = 0;
+                                        Encoder.XOR[(x << 2) + posCY + 1] = 0;
+                                        Encoder.XOR[(x << 2) + posCY + 2] = 0;
                                     }
                                     else
-                                    {
-                                        if (mEncoder.XOR[(x << 2) + posCY + 0] == transparentColor.B &&
-                                            mEncoder.XOR[(x << 2) + posCY + 1] == transparentColor.G &&
-                                            mEncoder.XOR[(x << 2) + posCY + 2] == transparentColor.R)
-                                        {
-                                            mEncoder.AND[(x >> 3) + posBY] |= (byte) (0x80 >> (x & 7));
-                                            mEncoder.XOR[(x << 2) + posCY + 0] = 0;
-                                            mEncoder.XOR[(x << 2) + posCY + 1] = 0;
-                                            mEncoder.XOR[(x << 2) + posCY + 2] = 0;
-                                        }
-                                        else
-                                        {
-                                            mEncoder.XOR[(x << 2) + posCY + 3] = 255;
-                                        }
-                                    }
+
+                                        Encoder.XOR[(x << 2) + posCY + 3] = 255;
                                     break;
                             }
                         }
@@ -382,10 +347,10 @@ namespace System.Drawing.IconLib
                 else
                 {
                     // Mask is coming by parameter, so we don't need to create it
-                    BitmapData bmpBWData    = mask.LockBits(new Rectangle(0,0, mask.Width, mask.Height), ImageLockMode.ReadOnly, mask.PixelFormat);
-                    IntPtr scanBW           = bmpBWData.Scan0;
-                    mEncoder.AND          = new byte[Math.Abs(bmpBWData.Stride) * bmpBWData.Height];
-                    Marshal.Copy(scanBW, mEncoder.AND, 0, mEncoder.AND.Length);
+                    BitmapData bmpBWData = mask.LockBits(new Rectangle(0, 0, mask.Width, mask.Height), ImageLockMode.ReadOnly, mask.PixelFormat);
+                    IntPtr scanBW = bmpBWData.Scan0;
+                    Encoder.AND = new byte[Math.Abs(bmpBWData.Stride) * bmpBWData.Height];
+                    Marshal.Copy(scanBW, Encoder.AND, 0, Encoder.AND.Length);
                     mask.UnlockBits(bmpBWData);
                 }
             }
@@ -406,23 +371,23 @@ namespace System.Drawing.IconLib
             switch (GetIconImageFormat(stream))
             {
                 case IconImageFormat.BMP:
-                {
-                    mEncoder = new BMPEncoder();
-                    mEncoder.Read(stream, resourceSize);
-                    break;
-                }
+                    {
+                        Encoder = new BMPEncoder();
+                        Encoder.Read(stream, resourceSize);
+                        break;
+                    }
                 case IconImageFormat.PNG:
-                {
-                    mEncoder = new PNGEncoder();
-                    mEncoder.Read(stream, resourceSize);
-                    break;
-                }
+                    {
+                        Encoder = new PNGEncoder();
+                        Encoder.Read(stream, resourceSize);
+                        break;
+                    }
             }
         }
 
         internal unsafe void Write(Stream stream)
         {
-            mEncoder.Write(stream);
+            Encoder.Write(stream);
         }
         #endregion
 
@@ -436,7 +401,7 @@ namespace System.Drawing.IconLib
                 BinaryReader br = new BinaryReader(stream);
                 byte[] array = new byte[sizeof(BITMAPINFOHEADER)];
                 byte bSignature = br.ReadByte();
-                switch(bSignature)
+                switch (bSignature)
                 {
                     case 40: // BMP ?
                         return IconImageFormat.BMP;
