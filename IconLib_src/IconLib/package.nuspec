@@ -1,0 +1,38 @@
+<?xml version="1.0"?>
+<package>
+  <metadata>
+    <!--*-->
+    <id>IconLib</id>
+    <!--*-->
+    <version>0.74.1</version>
+    <title>IconLib</title>
+    <!--*-->
+    <authors>Franco, Gustavo; CastorTiu; Pierre Sprimont</authors>
+    <owners>Pierre Sprimont</owners>
+    <licenseUrl>https://github.com/pierresprim/IconLib/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/pierresprim/IconLib</projectUrl>
+    <!--
+    <iconUrl></iconUrl>
+-->
+    <requireLicenseAcceptance>true</requireLicenseAcceptance>
+    <!--*-->
+    <description>Icon utilities to extract icons in different formats and sizes</description>
+    <!--*-->
+    <releaseNotes>System requirements:
+.NET Framework version: 4.8
+OS: Windows
+New in this version:
+Updated project to the new .NET and code specifications
+Project link: https://github.com/pierresprim/IconLib
+License link: https://github.com/pierresprim/IconLib/blob/master/LICENSE
+</releaseNotes>
+    <copyright>Copyright © Franco, Gustavo 2006, Copyright © 2008 CastorTiu, Copyright © 2019 Pierre Sprimont</copyright>
+    <tags>
+    </tags>
+    <dependencies>
+      <!--
+      <dependency id="SampleDependency" version="1.0" />
+-->
+    </dependencies>
+  </metadata>
+</package>

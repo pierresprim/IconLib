@@ -151,6 +151,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="IconLib.snk" />
+    <None Include="package.nuspec" />
     <None Include="Resources\EmptyDll.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
