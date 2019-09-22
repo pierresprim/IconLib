@@ -10,7 +10,8 @@
     <authors>Franco, Gustavo; CastorTiu; Pierre Sprimont</authors>
     <owners>Pierre Sprimont</owners>
     <licenseUrl>https://github.com/pierresprim/IconLib/blob/master/LICENSE</licenseUrl>
-    <projectUrl>https://github.com/pierresprim/IconLib</projectUrl>
+    <projectUrl>http://wincopies.com</projectUrl>
+    <repository type="git" url="https://github.com/pierresprim/IconLib.git" />
     <!--
     <iconUrl></iconUrl>
 -->
@@ -19,24 +20,21 @@
     <description>Icon utilities to extract icons in different formats and sizes</description>
     <!--*-->
     <releaseNotes>System requirements:
-
 .NET Framework version: 4.0
 OS: Windows
-
 New in this version:
-
 Package now depends on .NET 4.0 instead of .NET 4.8
 Package supports Source Link
-Project link: https://github.com/pierresprim/IconLib
-
-License link: https://github.com/pierresprim/IconLib/blob/master/LICENSE</releaseNotes>
+Project link: http://wincopies.com
+License link: https://github.com/pierresprim/IconLib/blob/master/LICENSE
+</releaseNotes>
     <copyright>Copyright © Franco, Gustavo 2006, Copyright © 2008 CastorTiu, Copyright © 2019 Pierre Sprimont</copyright>
     <tags>
     </tags>
     <dependencies>
-      <!--
-      <dependency id="SampleDependency" version="1.0" />
--->
+      <dependency id="Microsoft.Build.Tasks.Git" version="1.0.0-beta2-19367-01" />
+      <dependency id="Microsoft.SourceLink.Common" version="1.0.0-beta2-19367-01" />
+      <dependency id="Microsoft.SourceLink.GitHub" version="1.0.0-beta2-19367-01" />
     </dependencies>
   </metadata>
 </package>
