@@ -1,4 +1,7 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+  <Import Project="..\..\MultiIcon\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.props" Condition="Exists('..\..\MultiIcon\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.props')" />
+  <Import Project="..\..\MultiIcon\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.props" Condition="Exists('..\..\MultiIcon\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.props')" />
+  <Import Project="..\..\MultiIcon\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.props" Condition="Exists('..\..\MultiIcon\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.props')" />
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
@@ -24,6 +27,8 @@
     <OldToolsVersion>2.0</OldToolsVersion>
     <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <DebugSymbols>true</DebugSymbols>
@@ -152,9 +157,24 @@
   <ItemGroup>
     <None Include="IconLib.snk" />
     <None Include="package.nuspec" />
+    <None Include="packages.config" />
     <None Include="Resources\EmptyDll.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
+  <Target Name="EnsureNuGetPackageBuildImports" BeforeTargets="PrepareForBuild">
+    <PropertyGroup>
+      <ErrorText>Ce projet fait référence à des packages NuGet qui sont manquants sur cet ordinateur. Utilisez l'option de restauration des packages NuGet pour les télécharger. Pour plus d'informations, consultez http://go.microsoft.com/fwlink/?LinkID=322105. Le fichier manquant est : {0}.</ErrorText>
+    </PropertyGroup>
+    <Error Condition="!Exists('..\..\MultiIcon\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\MultiIcon\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.props'))" />
+    <Error Condition="!Exists('..\..\MultiIcon\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\MultiIcon\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.targets'))" />
+    <Error Condition="!Exists('..\..\MultiIcon\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\MultiIcon\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.props'))" />
+    <Error Condition="!Exists('..\..\MultiIcon\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\MultiIcon\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.targets'))" />
+    <Error Condition="!Exists('..\..\MultiIcon\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\MultiIcon\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.props'))" />
+    <Error Condition="!Exists('..\..\MultiIcon\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\MultiIcon\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.targets'))" />
+  </Target>
+  <Import Project="..\..\MultiIcon\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.targets" Condition="Exists('..\..\MultiIcon\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.targets')" />
+  <Import Project="..\..\MultiIcon\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.targets" Condition="Exists('..\..\MultiIcon\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.targets')" />
+  <Import Project="..\..\MultiIcon\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.targets" Condition="Exists('..\..\MultiIcon\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
