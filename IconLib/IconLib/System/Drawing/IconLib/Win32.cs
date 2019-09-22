@@ -109,10 +109,10 @@ namespace System.Drawing.IconLib
         #region MACROS
         public static bool IS_INTRESOURCE(IntPtr value)
         {
-#if x86 || AnyCPU
-            return ((uint)value) <= ushort.MaxValue;
-#elif x64
+#if x64
             return ((ulong)value) <= ushort.MaxValue;
+#else
+            return ((uint)value) <= ushort.MaxValue;
 #endif
         }
 
