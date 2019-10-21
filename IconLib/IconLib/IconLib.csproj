@@ -1,4 +1,7 @@
 ﻿<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003" ToolsVersion="12.0">
+  <Import Project="..\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.props" Condition="Exists('..\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.props')" />
+  <Import Project="..\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.props" Condition="Exists('..\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.props')" />
+  <Import Project="..\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.props" Condition="Exists('..\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.props')" />
   <Import Project="..\..\MultiIcon\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.props" Condition="Exists('..\..\MultiIcon\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.props')" />
   <Import Project="..\..\MultiIcon\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.props" Condition="Exists('..\..\MultiIcon\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.props')" />
   <Import Project="..\..\MultiIcon\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.props" Condition="Exists('..\..\MultiIcon\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.props')" />
@@ -64,6 +67,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x86'">
     <OutputPath>bin\x86\Release\</OutputPath>
@@ -74,6 +78,7 @@
     <PlatformTarget>x86</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
     <DebugSymbols>true</DebugSymbols>
@@ -84,6 +89,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
     <OutputPath>bin\x64\Release\</OutputPath>
@@ -94,6 +100,7 @@
     <PlatformTarget>x64</PlatformTarget>
     <ErrorReport>prompt</ErrorReport>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
@@ -166,6 +173,7 @@
   <ItemGroup>
     <None Include="IconLib.snk" />
     <None Include="package.nuspec" />
+    <None Include="packages.config" />
     <None Include="Resources\EmptyDll.dll" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
@@ -179,10 +187,19 @@
     <Error Condition="!Exists('..\..\MultiIcon\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\MultiIcon\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.targets'))" />
     <Error Condition="!Exists('..\..\MultiIcon\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.props')" Text="$([System.String]::Format('$(ErrorText)', '..\..\MultiIcon\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.props'))" />
     <Error Condition="!Exists('..\..\MultiIcon\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\..\MultiIcon\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.targets'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.props')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.props'))" />
+    <Error Condition="!Exists('..\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.targets')" Text="$([System.String]::Format('$(ErrorText)', '..\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.targets'))" />
   </Target>
   <Import Project="..\..\MultiIcon\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.targets" Condition="Exists('..\..\MultiIcon\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.targets')" />
   <Import Project="..\..\MultiIcon\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.targets" Condition="Exists('..\..\MultiIcon\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.targets')" />
   <Import Project="..\..\MultiIcon\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.targets" Condition="Exists('..\..\MultiIcon\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.targets')" />
+  <Import Project="..\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.targets" Condition="Exists('..\packages\Microsoft.Build.Tasks.Git.1.0.0-beta2-19367-01\build\Microsoft.Build.Tasks.Git.targets')" />
+  <Import Project="..\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.targets" Condition="Exists('..\packages\Microsoft.SourceLink.Common.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.Common.targets')" />
+  <Import Project="..\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.targets" Condition="Exists('..\packages\Microsoft.SourceLink.GitHub.1.0.0-beta2-19367-01\build\Microsoft.SourceLink.GitHub.targets')" />
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">
