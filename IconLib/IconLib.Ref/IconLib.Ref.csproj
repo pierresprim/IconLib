@@ -1,0 +1,72 @@
+<Project Sdk="MSBuild.Sdk.Extras/2.0.54">
+
+  <PropertyGroup>
+    <TargetFrameworks>net40;netstandard2.0</TargetFrameworks>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+  </PropertyGroup>
+
+  <PropertyGroup Label="AssemblyInfo">
+    <!-- Migrated from AssemblyInfo.cs -->
+    <Company>Pierre Sprimont</Company>
+    <Product>IconLib</Product>
+    <Version>0.74.3.1</Version>
+    <FileVersion>0.74.3.1</FileVersion>
+
+    <DefineConstants Condition="'$(Platform)'=='x64'">x64;$(DefineConstants)</DefineConstants>
+
+  </PropertyGroup>
+
+  <PropertyGroup Label="NuSpec">
+    <!-- Migrated from package.nuspec -->
+    <PackageId>IconLib</PackageId>
+    <PackageVersion>0.74.3.1-beta</PackageVersion>
+    <!-- TODO migrate to auto generated package version-->
+    <Title>IconLib</Title>
+    <Authors>Franco, Gustavo; CastorTiu; Pierre Sprimont</Authors>
+    <PackageLicenseUrl>https://github.com/pierresprim/IconLib/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>http://wincopies.com</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/pierresprim/IconLib.git</RepositoryUrl>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Description>Icon utilities to extract icons in different formats and sizes</Description>
+    <PackageReleaseNotes>
+      System requirements:
+
+      .NET Framework version: 4.0
+
+      OS: Windows
+
+      New in this version:
+
+      Package depends on SourceLink beta packages
+
+      Project link: http://wincopies.com
+
+      License link: https://github.com/pierresprim/IconLib/blob/master/LICENSE
+    </PackageReleaseNotes>
+    <Copyright>Copyright © Franco, Gustavo 2006, Copyright © 2008 CastorTiu, Copyright © 2019 Pierre Sprimont</Copyright>
+    <PackageTags>Icons</PackageTags>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Include="..\IconLib\**\*.cs" Exclude="..\IconLib\obj\**\*.*" />
+  </ItemGroup>
+
+  <PropertyGroup>
+    <SignAssembly>true</SignAssembly>
+  </PropertyGroup>
+  <PropertyGroup>
+    <AssemblyOriginatorKeyFile>..\IconLib\IconLib.snk</AssemblyOriginatorKeyFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Reference Include="System" Condition="'$(TargetFramework)'=='net40'" />
+    <Reference Include="System.Drawing" Condition="'$(TargetFramework)'=='net40'" />    
+  </ItemGroup>
+  <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
+    <PackageReference Include="System.Drawing.Common">
+      <Version>4.7.0</Version>
+    </PackageReference>
+  </ItemGroup>
+
+</Project>
