@@ -9,8 +9,9 @@
     <!-- Migrated from AssemblyInfo.cs -->
     <Company>Pierre Sprimont</Company>
     <Product>IconLib</Product>
-    <Version>0.74.3.1</Version>
-    <FileVersion>0.74.3.1</FileVersion>
+
+    <VersionPrefix>0.74.4</VersionPrefix>
+    <VersionSuffix>beta-1</VersionSuffix>
 
     <DefineConstants Condition="'$(Platform)'=='x64'">x64;$(DefineConstants)</DefineConstants>
 
@@ -19,8 +20,6 @@
   <PropertyGroup Label="NuSpec">
     <!-- Migrated from package.nuspec -->
     <PackageId>IconLib</PackageId>
-    <PackageVersion>0.74.3.1-beta</PackageVersion>
-    <!-- TODO migrate to auto generated package version-->
     <Title>IconLib</Title>
     <Authors>Franco, Gustavo; CastorTiu; Pierre Sprimont</Authors>
     <PackageLicenseUrl>https://github.com/pierresprim/IconLib/blob/master/LICENSE</PackageLicenseUrl>
