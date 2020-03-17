@@ -10,11 +10,17 @@ pool:
   name: 'Default'
 
 variables:
-  solution: 'IconLib\IconLib.sln'
-  buildPlatform: 'Any CPU'
-  buildConfiguration: 'Release'
-  buildMachine: '$(Agent.MachineName)'
-  buildUser: '$(Build.QueuedBy)'
+- group: Github-Packages
+- name: solution
+  value: 'IconLib\IconLib.sln'
+- name: buildPlatform
+  value: 'Any CPU'
+- name: buildConfiguration
+  value: 'Release'
+- name: buildMachine
+  value: '$(Agent.MachineName)'
+- name: buildUser
+  value: '$(Build.QueuedBy)'
 
 steps:
 - powershell: 'Write-Host ("##vso[task.setvariable variable=MSBuildEmitSolution;]0")'
@@ -26,9 +32,9 @@ steps:
 
 - task: NuGetCommand@2
   inputs:
+    command: 'restore'
     restoreSolution: '$(solution)'
-    feedsToUse: 'conifg'
-    nugetConfigPath: 'NuGet.config'
+    feedsToUse: 'config'
 
 - task: VSBuild@1
   inputs:
@@ -36,18 +42,42 @@ steps:
     platform: '$(buildPlatform)'
     configuration: '$(buildConfiguration)'
     clean: true
-    msbuildArgs: '/t:IconLib:Pack /p:PushPackage=false /p:PackageOutputPath="$(Build.ArtifactStagingDirectory)" /p:BuildUser="$(buildUser)" /p:BuildMachine="$(buildMachine)" /p:AssemblyVersionSuffix="-ci" /p:AssemblyOriginatorKeyFile="$(app_snk.secureFilePath)" /p:CodeSigingThumbprint="$(app_pfx_thumbprint)"'
+    msbuildArgs: '/t:IconLib:Pack /p:PushPackage=false /p:PackageOutputPath="$(Build.ArtifactStagingDirectory)" /p:BuildUser="$(buildUser)" /p:BuildMachine="$(buildMachine)" /p:AssemblyVersionSuffix="-ci"'
 
 - task: PublishBuildArtifacts@1
   inputs:
     PathtoPublish: '$(build.artifactstagingdirectory)'
 
-- task: NuGetCommand@2
-  displayName: 'NuGet push to GitHub Packages'
+- task: CopyFiles@2
+  displayName: Create nuget publish config
   inputs:
-    command: 'push'
-    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
-    nuGetFeedType: 'external'
-    feedsToUse: 'config'
-    nugetConfigPath: 'NuGet.config'
-    externalFeedCredentials: '$(GITHUB_TOKEN)'
+    sourceFolder: $(Build.SourcesDirectory)\IconLib
+    contents: 'nuget.publish.config'
+    targetFolder: $(Build.ArtifactStagingDirectory)
+
+- task: PowerShell@2
+  displayName: Build Nuget Source URL
+  inputs:
+    targetType: 'inline'
+    script: |
+      $owner = "$env:GITHUB_OWNER"
+      $source = "https://nuget.pkg.github.com/" + $owner.ToLower() + "/index.json"
+      Write-Host ("Nuget Source URL = $source")
+      Write-Host ("##vso[task.setvariable variable=NUGET_SOURCE]$source")
+  env:
+    GITHUB_OWNER: $(GITHUB_OWNER)
+
+- script: nuget.exe sources Add -NonInteractive -Name GitHub -Source "%NUGET_SOURCE%" -Username "%GITHUB_USERNAME%" -Password "%GITHUB_TOKEN%" -ConfigFile %NUGET_CONFIG%
+  displayName: Add github package source
+  env:
+    GITHUB_OWNER: $(GITHUB_OWNER)
+    GITHUB_USERNAME: $(GITHUB_USERNAME)
+    GITHUB_TOKEN: $(GITHUB_TOKEN)
+    NUGET_SOURCE: $(NUGET_SOURCE)
+    NUGET_CONFIG: $(Build.ArtifactStagingDirectory)\nuget.publish.config
+
+- script: nuget push -Source GitHub -ConfigFile %NUGET_CONFIG% -SkipDuplicate "%PACKAGES_DIR%\*.nupkg"
+  displayName: Push Nuget Packages to $(GITHUB_PACKAGES)
+  env:
+    PACKAGES_DIR: $(Build.ArtifactStagingDirectory)
+    NUGET_CONFIG: $(Build.ArtifactStagingDirectory)\nuget.publish.config
