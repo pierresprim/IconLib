@@ -1,14 +1,15 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras/2.0.54">
 
   <PropertyGroup>
+    <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
     <ExtrasBuildEachRuntimeIdentifier>true</ExtrasBuildEachRuntimeIdentifier>
     <DefineConstants Condition="'$(Platform)'=='x64'">x64;$(DefineConstants)</DefineConstants>
+
+    <Product>IconLib ($(TargetFramework) $(RuntimeIdentifier))</Product>
   </PropertyGroup>
   
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
     <AssemblyOriginatorKeyFile>IconLib.snk</AssemblyOriginatorKeyFile>
   </PropertyGroup>
   <PropertyGroup>
@@ -36,6 +37,7 @@
       <SubType>Designer</SubType>
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resource.Designer.cs</LastGenOutput>
+      <CustomToolNamespace>System.Drawing.IconLib</CustomToolNamespace>
     </EmbeddedResource>
   </ItemGroup>
   <ItemGroup>

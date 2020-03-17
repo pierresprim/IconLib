@@ -5,10 +5,14 @@
 
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
-  </PropertyGroup>
-  <PropertyGroup>
     <AssemblyOriginatorKeyFile>..\IconLib\IconLib.snk</AssemblyOriginatorKeyFile>
+
+    <Product>IconLib ($(TargetFramework) Ref)</Product>
   </PropertyGroup>
+
+  <ItemGroup>
+    <AssemblyMetadata Include="RuntimeIdentifier" Value="Ref" />
+  </ItemGroup>
 
   <ItemGroup>
     <Reference Include="System" Condition="'$(TargetFramework)'=='net40'" />

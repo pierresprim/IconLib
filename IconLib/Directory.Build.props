@@ -1,16 +1,14 @@
 <Project ToolsVersion="15.0"  DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <TargetFrameworks>net40;netstandard2.0</TargetFrameworks>
-    <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
     <RootNamespace>System.Drawing.IconLib</RootNamespace>
     <AssemblyName>IconLib</AssemblyName>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
 
     <Company>Pierre Sprimont</Company>
-    <Product>IconLib</Product>
 
     <VersionPrefix>0.74.4</VersionPrefix>
-    <VersionSuffix>beta-1</VersionSuffix>
+    <VersionSuffix>beta-2</VersionSuffix>
 
     <PackageId>IconLib</PackageId>
     <Title>IconLib</Title>
