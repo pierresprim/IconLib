@@ -1,0 +1,53 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  name: 'Default'
+
+variables:
+  solution: 'IconLib\IconLib.sln'
+  buildPlatform: 'Any CPU'
+  buildConfiguration: 'Release'
+  buildMachine: '$(Agent.MachineName)'
+  buildUser: '$(Build.QueuedBy)'
+
+steps:
+- powershell: 'Write-Host ("##vso[task.setvariable variable=MSBuildEmitSolution;]0")'
+  displayName: 'Ensure MSBuildEmitSolution is not set'
+
+- task: NuGetToolInstaller@0
+  inputs:
+    versionSpec: 5.4.0
+
+- task: NuGetCommand@2
+  inputs:
+    restoreSolution: '$(solution)'
+    feedsToUse: 'conifg'
+    nugetConfigPath: 'NuGet.config'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    clean: true
+    msbuildArgs: '/t:IconLib:Pack /p:PushPackage=false /p:PackageOutputPath="$(Build.ArtifactStagingDirectory)" /p:BuildUser="$(buildUser)" /p:BuildMachine="$(buildMachine)" /p:AssemblyVersionSuffix="-ci" /p:AssemblyOriginatorKeyFile="$(app_snk.secureFilePath)" /p:CodeSigingThumbprint="$(app_pfx_thumbprint)"'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)'
+
+- task: NuGetCommand@2
+  displayName: 'NuGet push to GitHub Packages'
+  inputs:
+    command: 'push'
+    packagesToPush: '$(Build.ArtifactStagingDirectory)/**/*.nupkg;!$(Build.ArtifactStagingDirectory)/**/*.symbols.nupkg'
+    nuGetFeedType: 'external'
+    feedsToUse: 'config'
+    nugetConfigPath: 'NuGet.config'
+    externalFeedCredentials: '$(GITHUB_TOKEN)'

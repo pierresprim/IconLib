@@ -1,53 +1,10 @@
 ﻿<Project Sdk="MSBuild.Sdk.Extras/2.0.54">
 
   <PropertyGroup>
-    <TargetFrameworks>net40;netstandard2.0</TargetFrameworks>
-    <RuntimeIdentifiers>win-x86;win-x64</RuntimeIdentifiers>
-    <!--<Platforms>AnyCPU;x64;x86</Platforms>-->
     <ExtrasBuildEachRuntimeIdentifier>true</ExtrasBuildEachRuntimeIdentifier>
-    <RootNamespace>System.Drawing.IconLib</RootNamespace>
-    <AssemblyName>IconLib</AssemblyName>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-  <PropertyGroup Label="AssemblyInfo"><!-- Migrated from AssemblyInfo.cs -->
-    <Company>Pierre Sprimont</Company>
-    <Product>IconLib</Product>
-    
-    <VersionPrefix>0.74.4</VersionPrefix>
-    <VersionSuffix>beta-1</VersionSuffix>
-
     <DefineConstants Condition="'$(Platform)'=='x64'">x64;$(DefineConstants)</DefineConstants>
-
   </PropertyGroup>
-  <PropertyGroup Label="NuSpec"><!-- Migrated from package.nuspec -->
-    <PackageId>IconLib</PackageId>
-    <Title>IconLib</Title>
-    <Authors>Franco, Gustavo; CastorTiu; Pierre Sprimont</Authors>
-    <PackageLicenseUrl>https://github.com/pierresprim/IconLib/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>http://wincopies.com</PackageProjectUrl>
-    <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/pierresprim/IconLib.git</RepositoryUrl>
-    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
-    <Description>Icon utilities to extract icons in different formats and sizes</Description>
-    <PackageReleaseNotes>
-      System requirements:
-
-      .NET Framework version: 4.0
-
-      OS: Windows
-
-      New in this version:
-
-      Package depends on SourceLink beta packages
-
-      Project link: http://wincopies.com
-
-      License link: https://github.com/pierresprim/IconLib/blob/master/LICENSE
-    </PackageReleaseNotes>
-    <Copyright>Copyright © Franco, Gustavo 2006, Copyright © 2008 CastorTiu, Copyright © 2019 Pierre Sprimont</Copyright>
-    <PackageTags>Icons</PackageTags>
-  </PropertyGroup>
-
+  
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
   </PropertyGroup>
@@ -65,10 +22,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" Condition="'$(TargetFramework)'=='net40'" />
-    <!--<Reference Include="System.Data" Condition="'$(TargetFramework)'=='net40'" />-->
     <Reference Include="System.Drawing" Condition="'$(TargetFramework)'=='net40'" />
-    <!--<Reference Include="System.Windows.Forms" Condition="'$(TargetFramework)'=='net40'" />
-    <Reference Include="System.Xml" Condition="'$(TargetFramework)'=='net40'" />-->
   </ItemGroup>
   <ItemGroup>
     <Compile Update="System\Drawing\IconLib\Resource.Designer.cs">
@@ -99,7 +53,4 @@
   <ItemGroup>
     <ReferenceAssemblyProjectReference Include="..\IconLib.Ref\IconLib.Ref.csproj" />
   </ItemGroup>
-  <!--<ItemGroup>
-    <None Include="bin/x64/$(Configuration)/*."
-  </ItemGroup>-->
 </Project>
