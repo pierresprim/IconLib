@@ -32,7 +32,7 @@ namespace System.Drawing.IconLib
         #endregion
 
         #region KERNEL32
-		[DllImport("KERNEL32.DLL")]
+		[DllImport("kernel32.DLL", EntryPoint = "RtlMoveMemory")]
 		public unsafe static extern void CopyMemory(void* dest, void* src, int length);
 		[DllImport("kernel32.dll", SetLastError=true)] 
 		public static extern IntPtr BeginUpdateResource(string pFileName, bool bDeleteExistingResources);

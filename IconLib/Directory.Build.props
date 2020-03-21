@@ -1,0 +1,42 @@
+<Project ToolsVersion="15.0"  DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <TargetFrameworks>net40;netstandard2.0</TargetFrameworks>
+    <RootNamespace>System.Drawing.IconLib</RootNamespace>
+    <AssemblyName>IconLib</AssemblyName>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+
+    <Company>Pierre Sprimont</Company>
+
+    <VersionPrefix>0.74.4</VersionPrefix>
+    <VersionSuffix>beta-2</VersionSuffix>
+
+    <PackageId>IconLib</PackageId>
+    <Title>IconLib</Title>
+    <Authors>Franco, Gustavo; CastorTiu; Pierre Sprimont</Authors>
+    <PackageLicenseUrl>https://github.com/pierresprim/IconLib/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/CZEMacLeod/IconLib</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <RepositoryUrl>https://github.com/CZEMacLeod/IconLib.git</RepositoryUrl>
+    <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
+    <Description>Icon utilities to extract icons in different formats and sizes</Description>
+    <PackageReleaseNotes>
+      System requirements:
+
+      .NET Framework version: 4.0
+      .NET Standard version: 2.0
+
+      OS: Windows (x86 or x64)
+
+      New in this version:
+
+      Package depends on SourceLink
+
+      Project link: https://github.com/CZEMacLeod/IconLib
+
+      License link: https://github.com/CZEMacLeod/IconLib/blob/master/LICENSE
+    </PackageReleaseNotes>
+    <Copyright>Copyright © Franco, Gustavo 2006, Copyright © 2008 CastorTiu, Copyright © 2019 Pierre Sprimont</Copyright>
+    <PackageTags>Icons</PackageTags>
+
+  </PropertyGroup>
+</Project>

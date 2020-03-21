@@ -1,0 +1,83 @@
+# Starter pipeline
+# Start with a minimal pipeline that you can customize to build and deploy your code.
+# Add steps that build, run tests, deploy, and more:
+# https://aka.ms/yaml
+
+trigger:
+- master
+
+pool:
+  name: 'Default'
+
+variables:
+- group: Github-Packages
+- name: solution
+  value: 'IconLib\IconLib.sln'
+- name: buildPlatform
+  value: 'Any CPU'
+- name: buildConfiguration
+  value: 'Release'
+- name: buildMachine
+  value: '$(Agent.MachineName)'
+- name: buildUser
+  value: '$(Build.QueuedBy)'
+
+steps:
+- powershell: 'Write-Host ("##vso[task.setvariable variable=MSBuildEmitSolution;]0")'
+  displayName: 'Ensure MSBuildEmitSolution is not set'
+
+- task: NuGetToolInstaller@0
+  inputs:
+    versionSpec: 5.4.0
+
+- task: NuGetCommand@2
+  inputs:
+    command: 'restore'
+    restoreSolution: '$(solution)'
+    feedsToUse: 'config'
+
+- task: VSBuild@1
+  inputs:
+    solution: '$(solution)'
+    platform: '$(buildPlatform)'
+    configuration: '$(buildConfiguration)'
+    clean: true
+    msbuildArgs: '/t:IconLib:Pack /p:PushPackage=false /p:PackageOutputPath="$(Build.ArtifactStagingDirectory)" /p:BuildUser="$(buildUser)" /p:BuildMachine="$(buildMachine)" /p:AssemblyVersionSuffix="-ci"'
+
+- task: PublishBuildArtifacts@1
+  inputs:
+    PathtoPublish: '$(build.artifactstagingdirectory)'
+
+- task: CopyFiles@2
+  displayName: Create nuget publish config
+  inputs:
+    sourceFolder: $(Build.SourcesDirectory)\IconLib
+    contents: 'nuget.publish.config'
+    targetFolder: $(Build.ArtifactStagingDirectory)
+
+- task: PowerShell@2
+  displayName: Build Nuget Source URL
+  inputs:
+    targetType: 'inline'
+    script: |
+      $owner = "$env:GITHUB_OWNER"
+      $source = "https://nuget.pkg.github.com/" + $owner.ToLower() + "/index.json"
+      Write-Host ("Nuget Source URL = $source")
+      Write-Host ("##vso[task.setvariable variable=NUGET_SOURCE]$source")
+  env:
+    GITHUB_OWNER: $(GITHUB_OWNER)
+
+- script: nuget.exe sources Add -NonInteractive -Name GitHub -Source "%NUGET_SOURCE%" -Username "%GITHUB_USERNAME%" -Password "%GITHUB_TOKEN%" -ConfigFile %NUGET_CONFIG%
+  displayName: Add github package source
+  env:
+    GITHUB_OWNER: $(GITHUB_OWNER)
+    GITHUB_USERNAME: $(GITHUB_USERNAME)
+    GITHUB_TOKEN: $(GITHUB_TOKEN)
+    NUGET_SOURCE: $(NUGET_SOURCE)
+    NUGET_CONFIG: $(Build.ArtifactStagingDirectory)\nuget.publish.config
+
+- script: nuget push -Source GitHub -ConfigFile %NUGET_CONFIG% -SkipDuplicate "%PACKAGES_DIR%\*.nupkg"
+  displayName: Push Nuget Packages to $(GITHUB_PACKAGES)
+  env:
+    PACKAGES_DIR: $(Build.ArtifactStagingDirectory)
+    NUGET_CONFIG: $(Build.ArtifactStagingDirectory)\nuget.publish.config

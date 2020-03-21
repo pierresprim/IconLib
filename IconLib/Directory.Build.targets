@@ -1,0 +1,19 @@
+<Project ToolsVersion="15.0"  DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <Target Name="GetAdditionalAssemblyAttributes" AfterTargets="GetAssemblyAttributes">
+    <ItemGroup>
+      <AssemblyMetadata Include="RuntimeIdentifier" Value="$(RuntimeIdentifier)" Condition="'$(RuntimeIdentifier)'!=''" />
+    </ItemGroup>
+
+    <ItemGroup Condition="'$(TargetFramework)'!='net40'">      
+      <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" Condition="%(AssemblyMetadata.Identity) != ''">
+        <_Parameter1>%(AssemblyMetadata.Identity)</_Parameter1>
+        <_Parameter2>%(AssemblyMetadata.Value)</_Parameter2>
+      </AssemblyAttribute>
+
+      <AssemblyAttribute Include="System.Reflection.AssemblyMetadataAttribute" Condition="$(CommitHash) != ''" >
+        <_Parameter1>CommitHash</_Parameter1>
+        <_Parameter2>$(CommitHash)</_Parameter2>
+      </AssemblyAttribute>
+    </ItemGroup>
+  </Target>
+</Project>
