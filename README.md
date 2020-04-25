@@ -24,6 +24,9 @@ New in this version:
       
 See: [https://wincopies.com/fwd.php?id=9](https://wincopies.com/fwd.php?id=9)
 
+Misc:
+-----
+
 Project link: [https://wincopies.com/fwd.php?id=7](https://wincopies.com/fwd.php?id=7)
 
 License link: [https://wincopies.com/fwd.php?id=10](https://wincopies.com/fwd.php?id=10)
