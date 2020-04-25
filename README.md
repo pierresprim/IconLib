@@ -5,6 +5,11 @@ README
 
 A fork of the [https://www.codeproject.com/Articles/16178/IconLib-Icons-Unfolded-MultiIcon-and-Windows-Vista](https://www.codeproject.com/Articles/16178/IconLib-Icons-Unfolded-MultiIcon-and-Windows-Vista) project
 
+License:
+--------
+
+[https://wincopies.com/fwd.php?id=10](https://wincopies.com/fwd.php?id=10)
+
 System requirements:
 --------------------
 
