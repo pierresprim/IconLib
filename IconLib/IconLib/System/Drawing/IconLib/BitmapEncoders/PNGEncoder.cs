@@ -16,12 +16,8 @@
 //  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR
 //  PURPOSE. IT CAN BE DISTRIBUTED FREE OF CHARGE AS LONG AS THIS HEADER 
 //  REMAINS UNCHANGED.
-using System;
 using System.IO;
-using System.Text;
 using System.Drawing.Imaging;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
 
 namespace System.Drawing.IconLib.BitmapEncoders
 {
@@ -48,7 +44,7 @@ namespace System.Drawing.IconLib.BitmapEncoders
                 // Soon Ill implement a png cache, 
                 // then the image will be generated just once between calls and writes
                 int length = 0;
-                using (MemoryStream ms = new MemoryStream())
+                using (var ms = new MemoryStream())
                 {
                     Icon.ToBitmap().Save(ms, ImageFormat.Png);
                     length = (int)ms.Length;
@@ -59,16 +55,16 @@ namespace System.Drawing.IconLib.BitmapEncoders
         #endregion
 
         #region Methods
-        public unsafe override void Read(Stream stream, int resourceSize)
+        public unsafe override void Read(in Stream stream, in int resourceSize)
         {
             // Buffer a PNG image
             byte[] buffer = new byte[resourceSize];
-            stream.Read(buffer, 0, buffer.Length);
-            MemoryStream ms = new MemoryStream(buffer);
-            Bitmap pngBitmap = new Bitmap(ms);
+            _ = stream.Read(buffer, 0, buffer.Length);
+            var ms = new MemoryStream(buffer);
+            var pngBitmap = new Bitmap(ms);
 
             // Set XOR and AND Image
-            IconImage iconImage = new IconImage();
+            var iconImage = new IconImage();
             iconImage.Set(pngBitmap, null, Color.Transparent);
             pngBitmap.Dispose();
 
@@ -76,13 +72,13 @@ namespace System.Drawing.IconLib.BitmapEncoders
             CopyFrom(iconImage.Encoder);
         }
 
-        public override void Write(Stream stream)
+        public override void Write(in Stream stream)
         {
-            MemoryStream ms = new MemoryStream();
+            var ms = new MemoryStream();
             Icon.ToBitmap().Save(ms, ImageFormat.Png);
             byte[] buffer = ms.GetBuffer();
             stream.Write(buffer, 0, (int)ms.Length);
-        }
-        #endregion
     }
+    #endregion
+}
 }

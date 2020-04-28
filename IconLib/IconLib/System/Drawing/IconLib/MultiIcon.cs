@@ -16,14 +16,11 @@
 //  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR
 //  PURPOSE. IT CAN BE DISTRIBUTED FREE OF CHARGE AS LONG AS THIS HEADER 
 //  REMAINS UNCHANGED.
-using System;
 using System.IO;
-using System.Text;
-using System.Collections;
 using System.Collections.Generic;
-using System.Runtime.InteropServices;
 using System.Drawing.IconLib.Exceptions;
 using System.Drawing.IconLib.EncodingFormats;
+using static WinCopies.Util.Util;
 
 namespace System.Drawing.IconLib
 {
@@ -31,19 +28,17 @@ namespace System.Drawing.IconLib
     public class MultiIcon : List<SingleIcon>
     {
         #region Variables Declaration
-        private int mSelectedIndex  = -1;
+        private int mSelectedIndex = -1;
         #endregion
 
         #region Constructors
-        public MultiIcon()
-        {
-        }
+        public MultiIcon() { }
 
-        public MultiIcon(IEnumerable<SingleIcon> collection) => AddRange(collection);
+        public MultiIcon(in IEnumerable<SingleIcon> collection) => AddRange(collection);
 
-        public MultiIcon(SingleIcon singleIcon)
+        public MultiIcon(in SingleIcon singleIcon)
         {
-            Add(singleIcon);
+            Add(singleIcon??throw GetArgumentNullException(nameof(singleIcon)));
             SelectedName = singleIcon.Name;
         }
         #endregion
@@ -63,19 +58,13 @@ namespace System.Drawing.IconLib
 
         public string SelectedName
         {
-            get
-            {
-                if (mSelectedIndex < 0 || mSelectedIndex >= Count)
-                    return null;
-
-                return this[mSelectedIndex].Name;
-            }
+            get => mSelectedIndex < 0 || mSelectedIndex >= Count ? null : this[mSelectedIndex].Name;
             set
             {
                 if (value == null)
-                    throw new ArgumentNullException(nameof(SelectedName));
+                    throw GetArgumentNullException(nameof(SelectedName));
 
-                for(int i=0; i<Count; i++)
+                for (int i = 0; i < Count; i++)
                     if (this[i].Name.ToLower() == value.ToLower())
                     {
                         mSelectedIndex = i;
@@ -88,10 +77,10 @@ namespace System.Drawing.IconLib
 
         public string[] IconNames
         {
-            get 
+            get
             {
-                List<string> names = new List<string>();
-                foreach(SingleIcon icon in this)
+                var names = new List<string>(Count);
+                foreach (SingleIcon icon in this)
                     names.Add(icon.Name);
                 return names.ToArray();
             }
@@ -99,11 +88,11 @@ namespace System.Drawing.IconLib
         #endregion
 
         #region Indexers
-        public SingleIcon this[string name]
+        public SingleIcon this[in string name]
         {
             get
             {
-                for(int i=0; i<Count; i++)
+                for (int i = 0; i < Count; i++)
                     if (this[i].Name.ToLower() == name.ToLower())
                         return this[i];
                 return null;
@@ -112,23 +101,25 @@ namespace System.Drawing.IconLib
         #endregion
 
         #region Public Methods
-        public SingleIcon Add(string iconName)
+        public SingleIcon Add(in string iconName)
         {
             // Already exist?
             if (Contains(iconName))
+
                 throw new IconNameAlreadyExistException();
 
             // Lets Create the icon group
             // Add group to the master list and also lets give a name
-            SingleIcon singleIcon = new SingleIcon(iconName);
+            var singleIcon = new SingleIcon(iconName);
             Add(singleIcon);
             return singleIcon;
         }
 
-        public void Remove(string iconName)
+        public void Remove(in string iconName)
         {
             if (iconName == null)
-                throw new ArgumentNullException(nameof(iconName));
+
+                throw GetArgumentNullException(nameof(iconName));
 
             // If not exist then do nothing
             int index = IndexOf(iconName);
@@ -138,42 +129,41 @@ namespace System.Drawing.IconLib
             RemoveAt(index);
         }
 
-        public bool Contains(string iconName)
+        public bool Contains(in string iconName) =>
+            // Exist?
+            IndexOf(iconName ?? throw GetArgumentNullException(nameof(iconName))) >= 0;
+
+        public int IndexOf(in string iconName)
         {
             if (iconName == null)
-                throw new ArgumentNullException(nameof(iconName));
+
+                throw GetArgumentNullException(nameof(iconName));
 
             // Exist?
-            return IndexOf(iconName) != -1 ? true : false;
-        }
+            for (int i = 0; i < Count; i++)
 
-        public int IndexOf(string iconName)
-        {
-            if (iconName == null)
-                throw new ArgumentNullException(nameof(iconName));
-
-            // Exist?
-            for(int i=0; i<Count; i++)
                 if (this[i].Name.ToLower() == iconName.ToLower())
+
                     return i;
+
             return -1;
         }
 
-        public void Load(string fileName)
+        public void Load(in string fileName)
         {
-            FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+            var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+
             try
             {
                 Load(fs);
             }
             finally
             {
-                if (fs != null)
-                    fs.Close();
+                fs?.Close();
             }
         }
 
-        public void Load(Stream stream)
+        public void Load(in Stream stream)
         {
             ILibraryFormat baseFormat;
 
@@ -207,26 +197,27 @@ namespace System.Drawing.IconLib
             SelectedIndex = Count > 0 ? 0 : -1;
         }
 
-        public void Save(string fileName, MultiIconFormat format)
+        public void Save(in string fileName, in MultiIconFormat format)
         {
-            FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite);
+            var fs = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite);
+
             try
             {
                 Save(fs, format);
             }
             finally
             {
-                if (fs != null)
-                    fs.Close();
+                fs?.Close();
             }
         }
 
-        public void Save(Stream stream, MultiIconFormat format)
+        public void Save(in Stream stream, in MultiIconFormat format)
         {
             switch (format)
             {
                 case MultiIconFormat.ICO:
                     if (mSelectedIndex == -1)
+
                         throw new InvalidIconSelectionException();
 
                     new IconFormat().Save(this, stream);
@@ -249,7 +240,7 @@ namespace System.Drawing.IconLib
         #endregion
 
         #region Private Methods
-        private void CopyFrom(MultiIcon multiIcon)
+        private void CopyFrom(in MultiIcon multiIcon)
         {
             mSelectedIndex = multiIcon.mSelectedIndex;
             Clear();

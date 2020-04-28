@@ -22,9 +22,7 @@ namespace System.Drawing.IconLib.Exceptions
     public class ImageTooBigException : Exception
     {
         #region Constructors
-        public ImageTooBigException() : base ("Image width and height cannot be bigger than 256 pixels.")
-        {
-        }
+        public ImageTooBigException() : base("Image width and height cannot be bigger than 256 pixels.") { }
         #endregion
     }
 }

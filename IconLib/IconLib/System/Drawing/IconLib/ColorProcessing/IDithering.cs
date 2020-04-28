@@ -16,19 +16,13 @@
 //  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR
 //  PURPOSE. IT CAN BE DISTRIBUTED FREE OF CHARGE AS LONG AS THIS HEADER 
 //  REMAINS UNCHANGED.
-using System;
-using System.Text;
-using System.Drawing;
-using System.Drawing.IconLib;
-using System.Collections.Generic;
-
 namespace System.Drawing.IconLib.ColorProcessing
 {
     [Author("Franco, Gustavo")]
     public interface IDithering
     {
         #region Methods
-        unsafe void Disperse(byte* pixelSource, int x, int y, byte bpp, int stride, int width, int height, Color colorEntry);
+        unsafe void Disperse(in byte* pixelSource, in int x, in int y, in byte bpp, in int stride, in int width, in int height, in Color colorEntry);
         #endregion
     }
 }

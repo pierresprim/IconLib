@@ -1,13 +1,56 @@
-<Project>
+<Project ToolsVersion="15.0"  DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <!-- SourceLink related properties https://github.com/dotnet/SourceLink#using-sourcelink -->
-    <!-- Optional: Publish the repository URL in the built .nupkg (in the NuSpec <Repository> element) -->
-    <PublishRepositoryUrl>true</PublishRepositoryUrl>
-     
-    <!-- Optional: Embed source files that are not tracked by the source control manager in the PDB -->
-    <EmbedUntrackedSources>true</EmbedUntrackedSources>
-    
-    <!-- Optional: Include the PDB in the built .nupkg -->
-    <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants Condition="'$(Platform)'=='x64'">x64;$(DefineConstants)</DefineConstants>
+    <DefineConstants Condition="'$(Platform)'=='x86'">x86;$(DefineConstants)</DefineConstants>
+
+    <Company>Pierre Sprimont</Company>
+
+    <VersionPrefix>0.74.4</VersionPrefix>
+    <VersionSuffix>beta-2</VersionSuffix>
+
+    <PackageProjectUrl>https://wincopies.com/fwd.php?id=7</PackageProjectUrl>
+    <RepositoryType>git</RepositoryType>
+    <Description>Icon utilities to extract icons in different formats and sizes</Description>
+    <PackageReleaseNotes>
+      See: https://wincopies.com/fwd.php?id=9
+    </PackageReleaseNotes>
+    <Copyright>Copyright © Franco, Gustavo 2006</Copyright>
+    <PackageTags>Icons</PackageTags>
+    <DocumentationFile>IconLib.xml</DocumentationFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <RepositoryUrl>https://wincopies.com/fwd.php?id=7</RepositoryUrl>
+
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DefineConstants>TRACE;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='net472'">
+    <DefineConstants>CS7;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <DefineConstants>CS7;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.1'">
+    <DefineConstants>CS8;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Platform)'=='x64'">
+    <DefineConstants>WIN64;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework.TrimEnd(`0123456789.`))' == 'netstandard'">
+    <DefineConstants>NETSTANDARD;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 </Project>

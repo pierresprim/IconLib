@@ -16,11 +16,9 @@
 //  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR
 //  PURPOSE. IT CAN BE DISTRIBUTED FREE OF CHARGE AS LONG AS THIS HEADER 
 //  REMAINS UNCHANGED.
-using System;
 using System.IO;
-using System.Text;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Microsoft.WindowsAPICodePack.Win32Native.GDI;
 
 namespace System.Drawing.IconLib.BitmapEncoders
 {
@@ -28,9 +26,7 @@ namespace System.Drawing.IconLib.BitmapEncoders
     internal class BMPEncoder : ImageEncoder
     {
         #region Constructors
-        public BMPEncoder()
-        {
-        }
+        public BMPEncoder() { }
         #endregion
 
         #region Properties
@@ -38,40 +34,40 @@ namespace System.Drawing.IconLib.BitmapEncoders
         #endregion
 
         #region Methods
-        public unsafe override void Read(Stream stream, int resourceSize)
+        public unsafe override void Read(in Stream stream, in int resourceSize)
         {
             // BitmapInfoHeader
-            mHeader.Read(stream);
+            Util.Read(ref mHeader, stream);
 
             // Palette
-            mColors             = new RGBQUAD[ColorsInPalette];
-            byte[] colorBuffer  = new byte[mColors.Length * sizeof(RGBQUAD)];
-            stream.Read(colorBuffer, 0, colorBuffer.Length);
-            GCHandle handle = GCHandle.Alloc(mColors, GCHandleType.Pinned);
+            mColors = new RGBQuad[ColorsInPalette];
+            byte[] colorBuffer = new byte[mColors.Length * Marshal.SizeOf<RGBQuad>()];
+            _ = stream.Read(colorBuffer, 0, colorBuffer.Length);
+            var handle = GCHandle.Alloc(mColors, GCHandleType.Pinned);
             Marshal.Copy(colorBuffer, 0, handle.AddrOfPinnedObject(), colorBuffer.Length);
             handle.Free();
 
             // XOR Image
-            int stride = (int) ((mHeader.biWidth * mHeader.biBitCount + 31) & ~31) >> 3;
+            int stride = (((mHeader.biWidth * mHeader.biBitCount) + 31) & ~31) >> 3;
             mXOR = new byte[stride * (mHeader.biHeight / 2)];
-            stream.Read(mXOR, 0, mXOR.Length);
+            _ = stream.Read(mXOR, 0, mXOR.Length);
 
             // AND Image
-            stride = (int) ((mHeader.biWidth * 1 + 31) & ~31) >> 3;
+            stride = (((mHeader.biWidth * 1) + 31) & ~31) >> 3;
             mAND = new byte[stride * (mHeader.biHeight / 2)];
-            stream.Read(mAND, 0, mAND.Length);
+            _ = stream.Read(mAND, 0, mAND.Length);
         }
 
-        public unsafe override void Write(Stream stream)
+        public unsafe override void Write(in Stream stream)
         {
             // BinaryReader br = new BinaryReader(stream);
 
             // BitmapInfoHeader
-            mHeader.Write(stream);
+            Util.Write(in mHeader, stream);
 
             // Palette
-            byte[] buffer = new byte[ColorsInPalette * sizeof(RGBQUAD)];
-            GCHandle handle = GCHandle.Alloc(mColors, GCHandleType.Pinned);
+            byte[] buffer = new byte[ColorsInPalette * Marshal.SizeOf<RGBQuad>()];
+            var handle = GCHandle.Alloc(mColors, GCHandleType.Pinned);
             Marshal.Copy(handle.AddrOfPinnedObject(), buffer, 0, buffer.Length);
             handle.Free();
             stream.Write(buffer, 0, buffer.Length);

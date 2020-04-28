@@ -22,14 +22,18 @@ namespace System.Drawing.IconLib.Exceptions
     [Author("Franco, Gustavo")]
     public class InvalidPixelFormatException : Exception
     {
-        #region Constructors
-        public InvalidPixelFormatException(PixelFormat invalid, PixelFormat expected) : base (invalid != PixelFormat.Undefined ?
-                                                                                            "PixelFormat " + invalid.ToString() + " is invalid" :
-                                                                                            expected != PixelFormat.Undefined ?
-                                                                                            "PixelFormat " + expected.ToString() + " expected" :
-                                                                                            "Invalid PixelFormat")
+        private static string GetExceptionMessage(in PixelFormat invalid, in PixelFormat expected)
         {
+            if (invalid == PixelFormat.Undefined)
+
+                return expected == PixelFormat.Undefined ? "Invalid PixelFormat" : $"PixelFormat {expected} expected";
+
+            return $"PixelFormat {invalid} is invalid";
         }
+
+        #region Constructors
+        public InvalidPixelFormatException(in PixelFormat invalid, in PixelFormat expected) : base(GetExceptionMessage(invalid, expected))
+        { }
         #endregion
     }
 }

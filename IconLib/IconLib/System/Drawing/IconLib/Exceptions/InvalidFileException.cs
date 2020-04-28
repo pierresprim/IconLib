@@ -22,9 +22,7 @@ namespace System.Drawing.IconLib.Exceptions
     public class InvalidFileException : Exception
     {
         #region Constructors
-        public InvalidFileException() : base ("Format not recognized by IconLib")
-        {
-        }
+        public InvalidFileException() : base("Format not recognized by IconLib") { }
         #endregion
     }
 }

@@ -16,11 +16,10 @@
 //  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR
 //  PURPOSE. IT CAN BE DISTRIBUTED FREE OF CHARGE AS LONG AS THIS HEADER 
 //  REMAINS UNCHANGED.
-using System;
 using System.IO;
-using System.Text;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
+using Microsoft.WindowsAPICodePack.Win32Native.GDI;
+using static System.Drawing.IconLib.Util;
 
 namespace System.Drawing.IconLib.BitmapEncoders
 {
@@ -28,16 +27,14 @@ namespace System.Drawing.IconLib.BitmapEncoders
     internal abstract class ImageEncoder
     {
         #region Variables Declaration
-        protected BITMAPINFOHEADER mHeader;
-        protected RGBQUAD[] mColors;
+        protected BitmapInfoHeader mHeader;
+        protected RGBQuad[] mColors;
         protected byte[] mXOR;
         protected byte[] mAND;
         #endregion
 
         #region Constructors
-        protected ImageEncoder()
-        {
-        }
+        protected ImageEncoder() { }
         #endregion
 
         #region Properties
@@ -45,35 +42,37 @@ namespace System.Drawing.IconLib.BitmapEncoders
         {
             get
             {
-                using (MemoryStream ms = new MemoryStream())
+                using (var ms = new MemoryStream())
                 {
 
                     // ICONDIR
                     ICONDIR iconDir = ICONDIR.Initalizated;
                     iconDir.idCount = 1;
-                    iconDir.Write(ms);
+                    Write<ICONDIR>(iconDir, ms);
 
                     // ICONDIRENTRY 
-                    ICONDIRENTRY iconEntry = new ICONDIRENTRY();
-                    iconEntry.bColorCount = (byte)mHeader.biClrUsed;
-                    iconEntry.bHeight = (byte)(mHeader.biHeight / 2);
-                    iconEntry.bReserved = 0;
-                    iconEntry.bWidth = (byte)mHeader.biWidth;
-                    iconEntry.dwBytesInRes = (uint)(sizeof(BITMAPINFOHEADER) +
-                                                sizeof(RGBQUAD) * ColorsInPalette +
-                                                mXOR.Length + mAND.Length);
-                    iconEntry.dwImageOffset = (uint)(sizeof(ICONDIR) + sizeof(ICONDIRENTRY));
-                    iconEntry.wBitCount = mHeader.biBitCount;
-                    iconEntry.wPlanes = mHeader.biPlanes;
-                    iconEntry.Write(ms);
+                    var iconEntry = new ICONDIRENTRY
+                    {
+                        bColorCount = (byte)mHeader.biClrUsed,
+                        bHeight = (byte)(mHeader.biHeight / 2),
+                        bReserved = 0,
+                        bWidth = (byte)mHeader.biWidth,
+                        dwBytesInRes = (uint)(Marshal.SizeOf<BitmapInfoHeader>() +
+                                                (Marshal.SizeOf<RGBQuad>() * ColorsInPalette) +
+                                                mXOR.Length + mAND.Length),
+                        dwImageOffset = (uint)(sizeof(ICONDIR) + sizeof(ICONDIRENTRY)),
+                        wBitCount = mHeader.biBitCount,
+                        wPlanes = mHeader.biPlanes
+                    };
+                    Write<ICONDIRENTRY>(iconEntry, ms);
 
                     // Image Info Header
-                    ms.Seek(iconEntry.dwImageOffset, SeekOrigin.Begin);
-                    mHeader.Write(ms);
+                    _ = ms.Seek(iconEntry.dwImageOffset, SeekOrigin.Begin);
+                    Write<BitmapInfoHeader>(mHeader, ms);
 
                     // Image Palette
-                    byte[] buffer = new byte[sizeof(RGBQUAD) * ColorsInPalette];
-                    GCHandle handle = GCHandle.Alloc(mColors, GCHandleType.Pinned);
+                    byte[] buffer = new byte[Marshal.SizeOf<RGBQuad>() * ColorsInPalette];
+                    var handle = GCHandle.Alloc(mColors, GCHandleType.Pinned);
                     Marshal.Copy(handle.AddrOfPinnedObject(), buffer, 0, buffer.Length);
                     handle.Free();
                     ms.Write(buffer, 0, buffer.Length);
@@ -87,18 +86,18 @@ namespace System.Drawing.IconLib.BitmapEncoders
                     // Rewind the stream
                     ms.Position = 0;
 
-                   return new Icon(ms, iconEntry.bWidth, iconEntry.bHeight);
+                    return new Icon(ms, iconEntry.bWidth, iconEntry.bHeight);
                 }
             }
         }
 
-        public virtual BITMAPINFOHEADER Header
+        public virtual BitmapInfoHeader Header
         {
             get => mHeader;
             set => mHeader = value;
         }
 
-        public virtual RGBQUAD[] Colors
+        public virtual RGBQuad[] Colors
         {
             get => mColors;
             set => mColors = value;
@@ -109,7 +108,7 @@ namespace System.Drawing.IconLib.BitmapEncoders
             get => mXOR;
             set
             {
-                mHeader.biSizeImage = (uint)value.Length;
+                mHeader.biSizeImage = (ushort)value.Length;
                 mXOR = value;
             }
         }
@@ -125,21 +124,18 @@ namespace System.Drawing.IconLib.BitmapEncoders
                                     mHeader.biBitCount <= 8 ?
                                         (uint)(1 << mHeader.biBitCount) : 0);
 
-        public unsafe virtual int ImageSize => sizeof(BITMAPINFOHEADER) + (sizeof(RGBQUAD) * ColorsInPalette) + mXOR.Length + mAND.Length;
+        public unsafe virtual int ImageSize => Marshal.SizeOf<BitmapInfoHeader>() + (Marshal.SizeOf<RGBQuad>() * ColorsInPalette) + mXOR.Length + mAND.Length;
 
-        public abstract IconImageFormat IconImageFormat
-        {
-            get;
-        }
+        public abstract IconImageFormat IconImageFormat { get; }
         #endregion
 
         #region Abstract Methods
-        public abstract void Read(Stream stream, int resourceSize);
-        public abstract void Write(Stream stream);
+        public abstract void Read(in Stream stream, in int resourceSize);
+        public abstract void Write(in Stream stream);
         #endregion
 
         #region Methods
-        public void CopyFrom(ImageEncoder encoder)
+        public void CopyFrom(in ImageEncoder encoder)
         {
             mHeader = encoder.mHeader;
             mColors = encoder.mColors;

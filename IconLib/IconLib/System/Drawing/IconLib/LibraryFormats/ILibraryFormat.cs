@@ -25,8 +25,8 @@ namespace System.Drawing.IconLib.EncodingFormats
 {
     public interface ILibraryFormat
     {
-        bool IsRecognizedFormat(Stream stream);
-        void Save(MultiIcon singleIcon, Stream stream);
-        MultiIcon Load(Stream stream);
+        bool IsRecognizedFormat(in Stream stream);
+        void Save(in MultiIcon singleIcon, in Stream stream);
+        MultiIcon Load(in Stream stream);
     }
 }

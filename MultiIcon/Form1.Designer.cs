@@ -1,4 +1,4 @@
-namespace MultiIconTester
+﻿namespace MultiIconTester
 {
     partial class FormIconBrowser
     {
@@ -387,12 +387,14 @@ namespace MultiIconTester
             this.Controls.Add(this.lblXORImage);
             this.Controls.Add(this.pbxXORImage);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+#if NETCORE
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+#endif
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "FormIconBrowser";
             this.StartPosition = System.Windows.Forms.FormStartPosition.CenterScreen;
-            this.Text = "Icon Browser 0.73";
+            this.Text = "Icon Browser";
             this.Load += new System.EventHandler(this.FormIconBrowser_Load);
             ((System.ComponentModel.ISupportInitialize)(this.pbxXORImage)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.pbxANDImage)).EndInit();
@@ -406,7 +408,7 @@ namespace MultiIconTester
 
         }
 
-        #endregion
+#endregion
 
         private System.Windows.Forms.ListBox lbxFiles;
         private System.Windows.Forms.Button btnBrowse;

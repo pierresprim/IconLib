@@ -16,10 +16,7 @@
 //  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR
 //  PURPOSE. IT CAN BE DISTRIBUTED FREE OF CHARGE AS LONG AS THIS HEADER 
 //  REMAINS UNCHANGED.
-using System;
-using System.Text;
 using System.Drawing.Imaging;
-using System.Collections.Generic;
 
 namespace System.Drawing.IconLib.ColorProcessing
 {
@@ -27,7 +24,7 @@ namespace System.Drawing.IconLib.ColorProcessing
     public interface IColorQuantizer
     {
         #region Methods
-        Bitmap Convert(Bitmap source, PixelFormat outputFormat);
+        Bitmap Convert(in Bitmap source, in PixelFormat outputFormat);
         #endregion
     }
 }

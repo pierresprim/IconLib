@@ -16,12 +16,9 @@
 //  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR
 //  PURPOSE. IT CAN BE DISTRIBUTED FREE OF CHARGE AS LONG AS THIS HEADER 
 //  REMAINS UNCHANGED.
-using System;
-using System.Text;
-using System.Drawing.IconLib;
 using System.Drawing.Imaging;
-using System.Collections.Generic;
-using System.Runtime.InteropServices;
+using Microsoft.WindowsAPICodePack.Win32Native.GDI;
+using Microsoft.WindowsAPICodePack.Win32Native;
 
 namespace System.Drawing.IconLib
 {
@@ -29,11 +26,12 @@ namespace System.Drawing.IconLib
     internal static class Tools
     {
         #region Methods
-        public static bool CompareRGBQUADToColor(RGBQUAD rgbQuad, Color color) => rgbQuad.rgbRed == color.R && rgbQuad.rgbGreen == color.G && rgbQuad.rgbBlue == color.B;
+        public static bool CompareRGBQuadToColor(in RGBQuad RGBQuad, in Color color) => RGBQuad.rgbRed == color.R && RGBQuad.rgbGreen == color.G && RGBQuad.rgbBlue == color.B;
 
-        public static unsafe void FlipYBitmap(Bitmap bitmap)
+        public static unsafe void FlipYBitmap(in Bitmap bitmap)
         {
             if (bitmap.PixelFormat != PixelFormat.Format1bppIndexed)
+
                 return;
 
             // .Net bug.. it can't flip in the Y axis a 1bpp properly
@@ -46,40 +44,43 @@ namespace System.Drawing.IconLib
 
                 for (int i = 0; i < bitmap.Height / 2; i++)
                 {
-                    Win32.CopyMemory(lptmpbuffer, pixelPtr + (i * bitmapData.Stride), bitmapData.Stride);
-                    Win32.CopyMemory(pixelPtr + (i * bitmapData.Stride), pixelPtr + (((bitmap.Height - 1) - i) * bitmapData.Stride), bitmapData.Stride);
-                    Win32.CopyMemory(pixelPtr + (((bitmap.Height - 1) - i) * bitmapData.Stride), lptmpbuffer, bitmapData.Stride);
-
+                    Core.CopyMemory(lptmpbuffer, pixelPtr + (i * bitmapData.Stride), (uint)bitmapData.Stride);
+                    Core.CopyMemory(pixelPtr + (i * bitmapData.Stride), pixelPtr + (((bitmap.Height - 1) - i) * bitmapData.Stride), (uint)bitmapData.Stride);
+                    Core.CopyMemory(pixelPtr + (((bitmap.Height - 1) - i) * bitmapData.Stride), lptmpbuffer, (uint)bitmapData.Stride);
                 }
 
             bitmap.UnlockBits(bitmapData);
         }
 
-        public static RGBQUAD[] StandarizePalette(RGBQUAD[] palette)
+        public static RGBQuad[] StandarizePalette(in RGBQuad[] palette)
         {
-            RGBQUAD[] newPalette = new RGBQUAD[256];
+            var newPalette = new RGBQuad[256];
+
             for (int i = 0; i < palette.Length; i++)
+
                 newPalette[i] = palette[i];
 
             return newPalette;
         }
 
-        public static RGBQUAD[] RGBQUADFromColorArray(Bitmap bmp)
+        public static RGBQuad[] RGBQuadFromColorArray(in Bitmap bmp)
         {
             // Some programs as Axialis have problems with a reduced palette, so lets create a full palette
-            int bits = Tools.BitsFromPixelFormat(bmp.PixelFormat);
-            RGBQUAD[] rgbArray = new RGBQUAD[bits <= 8 ? (1 << bits) : 0];
+            int bits = BitsFromPixelFormat(bmp.PixelFormat);
+            var rgbArray = new RGBQuad[bits <= 8 ? (1 << bits) : 0];
             Color[] entries = bmp.Palette.Entries;
+
             for (int i = 0; i < entries.Length; i++)
             {
                 rgbArray[i].rgbRed = entries[i].R;
                 rgbArray[i].rgbGreen = entries[i].G;
                 rgbArray[i].rgbBlue = entries[i].B;
             }
+
             return rgbArray;
         }
 
-        public static int BitsFromPixelFormat(PixelFormat pixelFormat)
+        public static int BitsFromPixelFormat(in PixelFormat pixelFormat)
         {
             switch (pixelFormat)
             {

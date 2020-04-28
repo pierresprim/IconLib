@@ -1,13 +1,12 @@
 <Project Sdk="MSBuild.Sdk.Extras/2.0.54">
-  <ItemGroup>
-    <Compile Include="..\IconLib\**\*.cs" Exclude="..\IconLib\obj\**\*.*" />
-  </ItemGroup>
 
   <PropertyGroup>
     <SignAssembly>true</SignAssembly>
     <AssemblyOriginatorKeyFile>..\IconLib\IconLib.snk</AssemblyOriginatorKeyFile>
 
     <Product>IconLib ($(TargetFramework) Ref)</Product>
+
+    <Platforms>AnyCPU;x64;x86</Platforms>
   </PropertyGroup>
 
   <ItemGroup>
@@ -15,8 +14,12 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="System.Drawing.Common" Version="4.6.0" />
+  </ItemGroup>
+
+  <ItemGroup>
     <Reference Include="System" Condition="'$(TargetFramework)'=='net40'" />
-    <Reference Include="System.Drawing" Condition="'$(TargetFramework)'=='net40'" />    
+    <Reference Include="System.Drawing" Condition="'$(TargetFramework)'=='net40'" />
   </ItemGroup>
   <ItemGroup Condition="'$(TargetFramework)' == 'netstandard2.0'">
     <PackageReference Include="System.Drawing.Common">

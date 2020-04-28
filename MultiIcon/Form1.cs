@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
@@ -10,14 +10,15 @@ using System.IO;
 using System.Drawing.Imaging;
 using System.Drawing.IconLib;
 using System.Drawing.IconLib.ColorProcessing;
+using System.Linq;
 
 namespace MultiIconTester
 {
     public partial class FormIconBrowser : Form
     {
         #region Variables Declaration
-        private string      mFolder     = string.Empty;
-        private MultiIcon   mMultiIcon  = new MultiIcon();
+        private string mFolder = string.Empty;
+        private readonly MultiIcon mMultiIcon = new MultiIcon();
         #endregion
 
         #region Constructors
@@ -35,9 +36,9 @@ namespace MultiIconTester
             {
                 PopulateFiles(Path.GetDirectoryName(Application.ExecutablePath));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -45,9 +46,10 @@ namespace MultiIconTester
         {
             dlgBrowse.SelectedPath = mFolder;
             dlgBrowse.ShowNewFolderButton = false;
-            dlgBrowse.ShowDialog(this);
+            _ = dlgBrowse.ShowDialog(this);
 
-            if (dlgBrowse.SelectedPath == null || dlgBrowse.SelectedPath == string.Empty)
+            if (string.IsNullOrEmpty(dlgBrowse.SelectedPath))
+
                 return;
 
             PopulateFiles(dlgBrowse.SelectedPath);
@@ -58,26 +60,28 @@ namespace MultiIconTester
             try
             {
                 if (lbxFiles.SelectedIndex == -1)
+
                     return;
 
                 lbxIcons.Items.Clear();
                 lbxImages.Items.Clear();
-                pbxXORImage.Image       = null;
-                pbxANDImage.Image       = null;
-                pbxIcon.Image           = null;
-                lblWidthValue.Text      = null;
-                lblHeightValue.Text     = null;
+                pbxXORImage.Image = null;
+                pbxANDImage.Image = null;
+                pbxIcon.Image = null;
+                lblWidthValue.Text = null;
+                lblHeightValue.Text = null;
                 lblColorDepthValue.Text = null;
-                lblCompressionValue.Text= null;
-                mMultiIcon.SelectedIndex= -1;
-                mMultiIcon.Load(Path.Combine(mFolder, (string) lbxFiles.SelectedItem));
+                lblCompressionValue.Text = null;
+                mMultiIcon.SelectedIndex = -1;
+                mMultiIcon.Load(Path.Combine(mFolder, (string)lbxFiles.SelectedItem));
 
-                foreach(SingleIcon singleIcon in mMultiIcon)
-                    lbxIcons.Items.Add(singleIcon.Name);
+                foreach (SingleIcon singleIcon in mMultiIcon)
+
+                    _ = lbxIcons.Items.Add(singleIcon.Name);
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -86,25 +90,27 @@ namespace MultiIconTester
             try
             {
                 if (lbxIcons.SelectedIndex == -1)
+
                     return;
 
                 lbxImages.Items.Clear();
-                pbxXORImage.Image       = null;
-                pbxANDImage.Image       = null;
-                pbxIcon.Image           = null;
-                lblWidthValue.Text      = null;
-                lblHeightValue.Text     = null;
+                pbxXORImage.Image = null;
+                pbxANDImage.Image = null;
+                pbxIcon.Image = null;
+                lblWidthValue.Text = null;
+                lblHeightValue.Text = null;
                 lblColorDepthValue.Text = null;
-                lblCompressionValue.Text= null;
-                mMultiIcon.SelectedIndex= lbxIcons.SelectedIndex;
-                foreach(IconImage iconImage in mMultiIcon[lbxIcons.SelectedIndex])
+                lblCompressionValue.Text = null;
+                mMultiIcon.SelectedIndex = lbxIcons.SelectedIndex;
+
+                foreach (IconImage iconImage in mMultiIcon[lbxIcons.SelectedIndex])
                 {
-                    lbxImages.Items.Add(iconImage.Size.Width + "x" + iconImage.Size.Height + " " + GetFriendlyBitDepth(iconImage.PixelFormat));
+                    _ = lbxImages.Items.Add(iconImage.Size.Width + "x" + iconImage.Size.Height + " " + GetFriendlyBitDepth(iconImage.PixelFormat));
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -113,20 +119,21 @@ namespace MultiIconTester
             try
             {
                 if (lbxImages.SelectedIndex == -1)
+
                     return;
 
-                IconImage iconImage     = mMultiIcon[lbxIcons.SelectedIndex][lbxImages.SelectedIndex];
-                pbxXORImage.Image       = iconImage.Image;
-                pbxANDImage.Image       = iconImage.Mask;
-                pbxIcon.Image           = iconImage.Icon.ToBitmap();
-                lblWidthValue.Text      = iconImage.Size.Width.ToString();
-                lblHeightValue.Text     = iconImage.Size.Height.ToString();
+                IconImage iconImage = mMultiIcon[lbxIcons.SelectedIndex][lbxImages.SelectedIndex];
+                pbxXORImage.Image = iconImage.Image;
+                pbxANDImage.Image = iconImage.Mask;
+                pbxIcon.Image = iconImage.Icon.ToBitmap();
+                lblWidthValue.Text = iconImage.Size.Width.ToString();
+                lblHeightValue.Text = iconImage.Size.Height.ToString();
                 lblColorDepthValue.Text = iconImage.PixelFormat.ToString();
-                lblCompressionValue.Text= iconImage.IconImageFormat.ToString();
+                lblCompressionValue.Text = iconImage.IconImageFormat.ToString();
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                _ = MessageBox.Show(this, ex.Message, "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
         }
 
@@ -135,17 +142,29 @@ namespace MultiIconTester
             dlgSave.DefaultExt = "icl";
             dlgSave.Filter = "Windows Icon File (*.ico)|*.ico|Icon Library File (*.icl)|*.icl|DLL Library File " +
                 "(*.dll)|*.dll|PNG Image File (*.png)|*.png|BMP Windows File (*.bmp)|*.bmp";
+
             if (dlgSave.ShowDialog(this) == DialogResult.OK)
             {
-                if (dlgSave.FileName.ToLower().EndsWith(".ico") && mMultiIcon.SelectedIndex != -1)
+                string fileName = dlgSave.FileName.ToLower();
+
+                if (fileName.EndsWith(".ico") && mMultiIcon.SelectedIndex != -1)
+
                     mMultiIcon.Save(dlgSave.FileName, MultiIconFormat.ICO);
-                else if (dlgSave.FileName.ToLower().EndsWith(".png") && mMultiIcon.SelectedIndex != -1 && lbxImages.SelectedIndex != -1)
+
+                else if (fileName.EndsWith(".png") && mMultiIcon.SelectedIndex != -1 && lbxImages.SelectedIndex != -1)
+
                     mMultiIcon[mMultiIcon.SelectedIndex][lbxImages.SelectedIndex].Transparent.Save(dlgSave.FileName, ImageFormat.Png);
-                else if (dlgSave.FileName.ToLower().EndsWith(".bmp") && mMultiIcon.SelectedIndex != -1 && lbxImages.SelectedIndex != -1)
+
+                else if (fileName.EndsWith(".bmp") && mMultiIcon.SelectedIndex != -1 && lbxImages.SelectedIndex != -1)
+
                     mMultiIcon[mMultiIcon.SelectedIndex][lbxImages.SelectedIndex].Transparent.Save(dlgSave.FileName, ImageFormat.Bmp);
-                else if (dlgSave.FileName.ToLower().EndsWith(".icl"))
+
+                else if (fileName.EndsWith(".icl"))
+
                     mMultiIcon.Save(dlgSave.FileName, MultiIconFormat.ICL);
-                else if (dlgSave.FileName.ToLower().EndsWith(".dll"))
+
+                else if (fileName.ToLower().EndsWith(".dll"))
+
                     mMultiIcon.Save(dlgSave.FileName, MultiIconFormat.DLL);
             }
         }
@@ -154,10 +173,13 @@ namespace MultiIconTester
         {
             dlgSave.DefaultExt = "bmp";
             dlgSave.Filter = "Windows Bitmap File (*.bmp)|*.bmp";
+
             if (mMultiIcon.SelectedIndex == -1 || lbxImages.SelectedIndex == -1)
+
                 return;
 
             if (dlgSave.ShowDialog(this) == DialogResult.OK)
+
                 mMultiIcon[mMultiIcon.SelectedIndex][lbxImages.SelectedIndex].Mask.Save(dlgSave.FileName, ImageFormat.Bmp);
         }
 
@@ -165,10 +187,13 @@ namespace MultiIconTester
         {
             dlgSave.DefaultExt = "bmp";
             dlgSave.Filter = "Windows Bitmap File (*.bmp)|*.bmp";
+
             if (mMultiIcon.SelectedIndex == -1 || lbxImages.SelectedIndex == -1)
+
                 return;
 
             if (dlgSave.ShowDialog(this) == DialogResult.OK)
+
                 mMultiIcon[mMultiIcon.SelectedIndex][lbxImages.SelectedIndex].Image.Save(dlgSave.FileName, ImageFormat.Bmp);
         }
         #endregion
@@ -176,15 +201,16 @@ namespace MultiIconTester
         #region Methods
         private void PopulateFiles(string folder)
         {
-            List<string> validFiles = new List<string>();
+            var validFiles = new LinkedList<string>();
+
             mFolder = folder;
 
-//            string[] files = Directory.GetFiles(folder, "*.ico, *.icl, *.dll, *.exe, *.ocx, *.cpl, *.src");
+            //            string[] files = Directory.GetFiles(folder, "*.ico, *.icl, *.dll, *.exe, *.ocx, *.cpl, *.src");
             string[] files = Directory.GetFiles(folder);
 
-            foreach(string file in files)
+            foreach (string file in files)
             {
-                switch(Path.GetExtension(file).ToLower())
+                switch (Path.GetExtension(file).ToLower())
                 {
                     case ".ico":
                     case ".icl":
@@ -193,7 +219,7 @@ namespace MultiIconTester
                     case ".ocx":
                     case ".cpl":
                     case ".src":
-                        validFiles.Add(Path.GetFileName(file));
+                        _ = validFiles.AddLast(Path.GetFileName(file));
                         break;
                 }
             }
@@ -203,7 +229,7 @@ namespace MultiIconTester
 
         private string GetFriendlyBitDepth(PixelFormat pixelFormat)
         {
-            switch(pixelFormat)
+            switch (pixelFormat)
             {
                 case PixelFormat.Format1bppIndexed:
                     return "1-bit B/W";
@@ -224,8 +250,7 @@ namespace MultiIconTester
         #region Override
         protected override void OnClosing(CancelEventArgs e)
         {
-            Form2 form = new Form2();
-            form.ShowDialog(this);
+            _ = new Form2().ShowDialog(this);
             base.OnClosing(e);
         }
         #endregion
@@ -233,15 +258,13 @@ namespace MultiIconTester
         #region Test methods
         private void btnCreate_Click(object sender, EventArgs e)
         {
-            MultiIcon multiIcon = new MultiIcon();
-            multiIcon.Add("Icon 1").Load(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Icon1.ico"));
-            multiIcon.Add("Icon 2").Load(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Icon2.ico"));
-            multiIcon.Add("Icon 3").Load(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Icon3.ico"));
-            multiIcon.Add("Icon 4").Load(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Icon4.ico"));
-            multiIcon.Add("Icon 5").Load(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Icon5.ico"));
-            multiIcon.Add("Icon 6").Load(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Icon6.ico"));
-            multiIcon.Add("Icon 7").Load(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "Icon7.ico"));
-            multiIcon.Save(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath),"library.icl"), MultiIconFormat.ICL);
+            var multiIcon = new MultiIcon();
+
+            for (int i = 1; i == 7; i++)
+
+                multiIcon.Add($"Icon {i}").Load(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), $"Icon{i}.ico"));
+
+            multiIcon.Save(Path.Combine(Path.GetDirectoryName(Application.ExecutablePath), "library.icl"), MultiIconFormat.ICL);
         }
         #endregion
 

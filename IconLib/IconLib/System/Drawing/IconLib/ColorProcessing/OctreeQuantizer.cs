@@ -20,6 +20,7 @@ using System;
 using System.Collections.Generic;
 using System.Text;
 using System.Drawing.Imaging;
+using static WinCopies.Util.Util;
 
 namespace System.Drawing.IconLib.ColorProcessing
 {
@@ -33,8 +34,10 @@ namespace System.Drawing.IconLib.ColorProcessing
         #endregion
 
         #region Methods
-        public unsafe ColorPalette CreatePalette(Bitmap image, int maxColors, int bitsPerPixel)
+        public unsafe ColorPalette CreatePalette(in Bitmap image, in int maxColors, in int bitsPerPixel)
         {
+            ThrowIfNull(image, nameof(image));
+
             int nPad;
             byte* pbBits;
             ushort* pwBits;
@@ -47,17 +50,23 @@ namespace System.Drawing.IconLib.ColorProcessing
             ColorPalette newPalette;
             Node tree;
             int nLeafCount, nIndex;
-            Node[] reducibleNodes = new Node[9];
+            var reducibleNodes = new Node[9];
 
             if (maxColors > Math.Pow(2, bitsPerPixel))
-                throw new Exception("param maxColors out of range, maximum " + Math.Pow(2, bitsPerPixel) + " colors for " + bitsPerPixel + " bits");
+
+                throw new ArgumentOutOfRangeException(nameof(maxColors), maxColors, $"param {nameof(maxColors)} out of range, maximum {Math.Pow(2, bitsPerPixel)} colors for {bitsPerPixel} bits");
 
             //// Initialize octree variables
             tree = null;
+
             nLeafCount = 0;
+
             if (bitsPerPixel > 8) // Just in case
+
                 return null;
+
             for (int i = 0; i <= bitsPerPixel; i++)
+
                 reducibleNodes[i] = null;
 
             BitmapData bitmapDataSource = image.LockBits(new Rectangle(0, 0, image.Width, image.Height), ImageLockMode.ReadWrite, image.PixelFormat);
@@ -84,6 +93,7 @@ namespace System.Drawing.IconLib.ColorProcessing
                             bleft = GetLeftShiftCount(bmask);
 
                             pwBits = (ushort*)bitmapDataSource.Scan0.ToPointer();
+
                             for (int i = 0; i < image.Height; i++)
                             {
                                 for (int j = 0; j < image.Width; j++)
@@ -96,6 +106,7 @@ namespace System.Drawing.IconLib.ColorProcessing
                                     AddColor(ref tree, r, g, b, bitsPerPixel, 0, ref nLeafCount, ref reducibleNodes);
 
                                     while (nLeafCount > maxColors)
+
                                         ReduceTree(bitsPerPixel, ref nLeafCount, ref reducibleNodes);
                                 }
                                 pwBits = (ushort*)(((byte*)pwBits) + nPad);
@@ -105,6 +116,7 @@ namespace System.Drawing.IconLib.ColorProcessing
                     case 24: // Another for 24-bit DIBs
                         {
                             pbBits = (byte*)bitmapDataSource.Scan0.ToPointer();
+
                             for (int i = 0; i < image.Height; i++)
                             {
                                 for (int j = 0; j < image.Width; j++)
@@ -116,8 +128,10 @@ namespace System.Drawing.IconLib.ColorProcessing
                                     AddColor(ref tree, r, g, b, bitsPerPixel, 0, ref nLeafCount, ref reducibleNodes);
 
                                     while (nLeafCount > maxColors)
+
                                         ReduceTree(bitsPerPixel, ref nLeafCount, ref reducibleNodes);
                                 }
+
                                 pbBits += nPad;
                             }
                             break;
@@ -133,6 +147,7 @@ namespace System.Drawing.IconLib.ColorProcessing
                             bright = GetRightShiftCount(bmask);
 
                             uint* pdwBits = (uint*)bitmapDataSource.Scan0.ToPointer();
+
                             for (int i = 0; i < image.Height; i++)
                             {
                                 for (int j = 0; j < image.Width; j++)
@@ -145,8 +160,10 @@ namespace System.Drawing.IconLib.ColorProcessing
                                     AddColor(ref tree, r, g, b, bitsPerPixel, 0, ref nLeafCount, ref reducibleNodes);
 
                                     while (nLeafCount > maxColors)
+
                                         ReduceTree(bitsPerPixel, ref nLeafCount, ref reducibleNodes);
                                 }
+
                                 pdwBits = (uint*)(((byte*)pdwBits) + nPad);
                             }
                             break;
@@ -156,12 +173,12 @@ namespace System.Drawing.IconLib.ColorProcessing
                 }
 
                 if (nLeafCount > maxColors)
-                {
+
                     // Sanity check
                     tree = null;
-                }
 
                 Bitmap bmp = null;
+
                 switch (bitsPerPixel)
                 {
                     case 1:
@@ -174,6 +191,7 @@ namespace System.Drawing.IconLib.ColorProcessing
                         bmp = new Bitmap(1, 1, PixelFormat.Format8bppIndexed);
                         break;
                 }
+
                 newPalette = bmp.Palette;
                 bmp.Dispose();
 
@@ -182,12 +200,15 @@ namespace System.Drawing.IconLib.ColorProcessing
 
                 // Fill the rest of the palette with 0s...
                 Color[] entries = newPalette.Entries;
+
                 for (int i = nIndex + 1; i < entries.Length; i++)
+
                     entries[i] = Color.FromArgb(0, 0, 0, 0);
             }
             finally
             {
-                if (bitmapDataSource != null)
+                if (bitmapDataSource is object)
+
                     image.UnlockBits(bitmapDataSource);
             }
 
@@ -196,14 +217,15 @@ namespace System.Drawing.IconLib.ColorProcessing
 
         private int GetRightShiftCount(uint dwVal)
         {
-            int i;
-
-            for (i = 0; i < sizeof(uint) * 8; i++)
+            for (int i = 0; i < sizeof(uint) * 8; i++)
             {
                 if ((dwVal & 1) == 1)
+
                     return i;
+
                 dwVal >>= 1;
             }
+
             return -1;
         }
 
@@ -211,37 +233,44 @@ namespace System.Drawing.IconLib.ColorProcessing
         {
             int nCount, i;
 
-            nCount = 0;
-            for (i = 0; i < sizeof(uint) * 8; i++)
+            nCount = i = 0;
+
+            for (; i < sizeof(uint) * 8; i++)
             {
                 if ((dwVal & 1) == 1)
+
                     nCount++;
+
                 dwVal >>= 1;
             }
+
             return 8 - nCount;
         }
 
-        private void GetPaletteColors(Node tree, ref ColorPalette palEntries, ref int index)
+        private void GetPaletteColors(in Node tree, ref ColorPalette palEntries, ref int index)
         {
-            int i;
-
             Color[] entries = palEntries.Entries;
 
             if (tree.bIsLeaf)
             {
                 entries[index] = Color.FromArgb(
-                                    (byte)((tree.nRedSum) / (tree.nPixelCount)),
-                                    (byte)((tree.nGreenSum) / (tree.nPixelCount)),
-                                    (byte)((tree.nBlueSum) / (tree.nPixelCount)));
+                                    (byte)(tree.nRedSum / tree.nPixelCount),
+                                    (byte)(tree.nGreenSum / tree.nPixelCount),
+                                    (byte)(tree.nBlueSum / tree.nPixelCount));
+
                 index++;
             }
+
             else
-                for (i = 0; i < 8; i++)
+
+                for (int i = 0; i < 8; i++)
+
                     if (tree.Child[i] != null)
+
                         GetPaletteColors(tree.Child[i], ref palEntries, ref index);
         }
 
-        private void ReduceTree(int nColorBits, ref int leafCount, ref Node[] reducibleNodes)
+        private void ReduceTree(in int nColorBits, ref int leafCount, ref Node[] reducibleNodes)
         {
             int i;
             Node node;
@@ -257,7 +286,9 @@ namespace System.Drawing.IconLib.ColorProcessing
 
             nRedSum = nGreenSum = nBlueSum = 0;
             nChildren = 0;
+
             for (i = 0; i < 8; i++)
+
                 if (node.Child[i] != null)
                 {
                     nRedSum += node.Child[i].nRedSum;
@@ -272,17 +303,22 @@ namespace System.Drawing.IconLib.ColorProcessing
             node.nRedSum = nRedSum;
             node.nGreenSum = nGreenSum;
             node.nBlueSum = nBlueSum;
-            leafCount -= (nChildren - 1);
+            leafCount -= nChildren - 1;
         }
 
-        private void AddColor(ref Node node, byte r, byte g, byte b, int nColorBits, int nLevel, ref int leafCount, ref Node[] reducibleNodes)
+        private void AddColor(ref Node node, in byte r, in byte g, in byte b, in int nColorBits, in int nLevel, ref int leafCount, ref Node[] reducibleNodes)
         {
             int nIndex, shift;
             byte[] mask = new byte[8] { 0x80, 0x40, 0x20, 0x10, 0x08, 0x04, 0x02, 0x01 };
 
             // If the node doesn't exist, create it
+#if CS8
+                node ??= CreateNode(nLevel, nColorBits, ref leafCount, ref reducibleNodes);
+#else
             if (node == null)
+
                 node = CreateNode(nLevel, nColorBits, ref leafCount, ref reducibleNodes);
+#endif
 
             // Update color information if it's a leaf node
             if (node.bIsLeaf)
@@ -292,6 +328,7 @@ namespace System.Drawing.IconLib.ColorProcessing
                 node.nGreenSum += g;
                 node.nBlueSum += b;
             }
+
             // Recurse a level deeper if the node is not a leaf
             else
             {
@@ -299,23 +336,29 @@ namespace System.Drawing.IconLib.ColorProcessing
                 nIndex = (((r & mask[nLevel]) >> shift) << 2) |
                     (((g & mask[nLevel]) >> shift) << 1) |
                     ((b & mask[nLevel]) >> shift);
+
                 AddColor(ref node.Child[nIndex], r, g, b, nColorBits, nLevel + 1, ref leafCount, ref reducibleNodes);
             }
         }
 
-        private Node CreateNode(int nLevel, int nColorBits, ref int leafCount, ref Node[] reducibleNodes)
+        private Node CreateNode(in int nLevel, in int nColorBits, ref int leafCount, ref Node[] reducibleNodes)
         {
-            Node newNode = new Node();
+            var newNode = new Node
+            {
+                bIsLeaf = nLevel == nColorBits
+            };
 
-            newNode.bIsLeaf = (nLevel == nColorBits);
             if (newNode.bIsLeaf)
+
                 leafCount++;
+
             else
             {
                 // Add the node to the reducible list for this level
                 newNode.Next = reducibleNodes[nLevel];
                 reducibleNodes[nLevel] = newNode;
             }
+
             return newNode;
         }
         #endregion

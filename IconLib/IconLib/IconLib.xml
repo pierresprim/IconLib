@@ -1,0 +1,29 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>IconLib</name>
+    </assembly>
+    <members>
+        <member name="T:System.Drawing.IconLib.Resource">
+            <summary>
+              Une classe de ressource fortement typée destinée, entre autres, à la consultation des chaînes localisées.
+            </summary>
+        </member>
+        <member name="P:System.Drawing.IconLib.Resource.ResourceManager">
+            <summary>
+              Retourne l'instance ResourceManager mise en cache utilisée par cette classe.
+            </summary>
+        </member>
+        <member name="P:System.Drawing.IconLib.Resource.Culture">
+            <summary>
+              Remplace la propriété CurrentUICulture du thread actuel pour toutes
+              les recherches de ressources à l'aide de cette classe de ressource fortement typée.
+            </summary>
+        </member>
+        <member name="P:System.Drawing.IconLib.Resource.EmptyDll">
+            <summary>
+              Recherche une ressource localisée de type System.Byte[].
+            </summary>
+        </member>
+    </members>
+</doc>

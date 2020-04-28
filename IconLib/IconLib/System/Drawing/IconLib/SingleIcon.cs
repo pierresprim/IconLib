@@ -16,17 +16,16 @@
 //  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR
 //  PURPOSE. IT CAN BE DISTRIBUTED FREE OF CHARGE AS LONG AS THIS HEADER 
 //  REMAINS UNCHANGED.
-using System;
 using System.IO;
-using System.Text;
 using System.Collections;
 using System.Drawing.Imaging;
-using System.Drawing.Drawing2D;
 using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Drawing.IconLib.Exceptions;
 using System.Drawing.IconLib.EncodingFormats;
 using System.Drawing.IconLib.ColorProcessing;
+using Microsoft.WindowsAPICodePack.Win32Native;
+using static WinCopies.Util.Util;
 
 namespace System.Drawing.IconLib
 {
@@ -39,7 +38,7 @@ namespace System.Drawing.IconLib
         #endregion
 
         #region Constructors
-        internal SingleIcon(string name) => mName = name;
+        internal SingleIcon(in string name) => mName = name;
         #endregion
 
         #region Properties
@@ -48,7 +47,7 @@ namespace System.Drawing.IconLib
         public string Name
         {
             get => mName;
-            set { mName = value ?? string.Empty; }
+            set => mName = value ?? string.Empty;
         }
 
         public Icon Icon
@@ -56,13 +55,13 @@ namespace System.Drawing.IconLib
             get
             {
                 if (mIconImages.Count == 0)
+
                     return null;
 
-                MemoryStream ms = new MemoryStream();
+                var ms = new MemoryStream();
                 Save(ms);
                 ms.Position = 0;
-                Icon icon = new Icon(ms);
-                return icon;
+                return new Icon(ms);
             }
         }
         #endregion
@@ -70,9 +69,10 @@ namespace System.Drawing.IconLib
         #region Public Methods
         public void Clear() => mIconImages.Clear();
 
-        public IconImage RemoveAt(int index)
+        public IconImage RemoveAt(in int index)
         {
             if (index < 0 || index >= mIconImages.Count)
+
                 return null;
 
             IconImage iconImage = mIconImages[index];
@@ -84,87 +84,84 @@ namespace System.Drawing.IconLib
 
         public IEnumerator<IconImage> GetEnumerator() => new Enumerator(this);
 
-        public void Load(string fileName)
+        public void Load(in string fileName)
         {
-            FileStream fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+            var fs = new FileStream(fileName, FileMode.Open, FileAccess.Read);
+
             try
             {
                 Load(fs);
             }
             finally
             {
-                if (fs != null)
-                    fs.Close();
+                fs?.Close();
             }
         }
 
-        public void Load(Stream stream)
+        public void Load(in Stream stream)
         {
-            IconFormat iconFormat = new IconFormat();
+            ThrowIfNull(stream, nameof(stream));
+
+            var iconFormat = new IconFormat();
+
             if (!iconFormat.IsRecognizedFormat(stream))
+
                 throw new InvalidFileException();
 
             MultiIcon multiIcon = iconFormat.Load(stream);
+
             if (multiIcon.Count < 1)
+
                 return;
 
             CopyFrom(multiIcon[0]);
         }
 
-        public void Save(string fileName)
+        public void Save(in string fileName)
         {
-            FileStream fs = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite);
+            var fs = new FileStream(fileName, FileMode.Create, FileAccess.ReadWrite);
+
             try
             {
                 Save(fs);
             }
             finally
             {
-                if (fs != null)
-                    fs.Close();
+                fs?.Close();
             }
         }
 
-        public void Save(Stream stream) => new IconFormat().Save(new MultiIcon(this), stream);
+        public void Save(in Stream stream) => new IconFormat().Save(new MultiIcon(this), stream);
 
-        public IconImage Add(Bitmap bitmap)
+        public IconImage Add(in Bitmap bitmap)
         {
-            if (bitmap == null)
-                throw new ArgumentNullException(nameof(bitmap));
-
-            if (bitmap.PixelFormat == PixelFormat.Format32bppArgb || bitmap.PixelFormat == PixelFormat.Format32bppPArgb)
+            if ((bitmap ?? throw GetArgumentNullException(nameof(bitmap))).PixelFormat == PixelFormat.Format32bppArgb || bitmap.PixelFormat == PixelFormat.Format32bppPArgb)
             {
                 IconImage iconImage = Add(bitmap, null, Color.Transparent);
+
                 if (bitmap.RawFormat.Guid == ImageFormat.Png.Guid)
+
                     iconImage.IconImageFormat = IconImageFormat.PNG;
+
                 return iconImage;
             }
+
             return Add(bitmap, null, bitmap.GetPixel(0, 0));
         }
 
-        public IconImage Add(Bitmap bitmap, Color transparentColor) => Add(bitmap, null, transparentColor);
+        public IconImage Add(in Bitmap bitmap, in Color transparentColor) => Add(bitmap, null, transparentColor);
 
-        public IconImage Add(Bitmap bitmap, Bitmap bitmapMask)
+        public IconImage Add(in Bitmap bitmap, in Bitmap bitmapMask) => Add(bitmap ?? throw GetArgumentNullException(nameof(bitmapMask)), bitmapMask, Color.Empty);
+
+        public IconImage Add(in Icon icon)
         {
-            if (bitmapMask == null)
-                throw new ArgumentNullException(nameof(bitmapMask));
+            if (!Core.GetIconInfo((icon ?? throw GetArgumentNullException(nameof(icon))).Handle, out IconInfo iconInfo))
 
-            return Add(bitmap, bitmapMask, Color.Empty);
-        }
-
-        public IconImage Add(Icon icon)
-        {
-            if (icon == null)
-                throw new ArgumentNullException(nameof(icon));
-
-            ICONINFO iconInfo;
-            bool bResult = Win32.GetIconInfo(icon.Handle, out iconInfo);
-
-            if (!bResult)
                 throw new InvalidMultiIconFileException();
 
             Bitmap XORImage = null;
             Bitmap ANDImage = null;
+
             try
             {
                 XORImage = Image.FromHbitmap(iconInfo.hbmColor);
@@ -179,15 +176,15 @@ namespace System.Drawing.IconLib
 
                     return Add(icon.ToBitmap(), Color.Transparent);
                 }
+
                 else
+
                     return Add(XORImage, ANDImage, Color.Empty);
             }
             finally
             {
-                if (XORImage != null)
-                    XORImage.Dispose();
-                if (ANDImage != null)
-                    ANDImage.Dispose();
+                XORImage?.Dispose();
+                ANDImage?.Dispose();
             }
         }
 
@@ -204,14 +201,11 @@ namespace System.Drawing.IconLib
         //    return newBitmap;
         //}
 
-        public void CreateFrom(string fileName) => CreateFrom(fileName, IconOutputFormat.FromWin95);
+        public void CreateFrom(in string fileName) => CreateFrom(fileName, IconOutputFormat.FromWin95);
 
-        public void CreateFrom(string fileName, IconOutputFormat format)
+        public void CreateFrom(in string fileName, in IconOutputFormat format)
         {
-            Bitmap bmp = (Bitmap)Bitmap.FromFile(fileName);
-
-            if (bmp == null)
-                throw new InvalidFileException();
+            Bitmap bmp = (Bitmap)Image.FromFile(fileName) ?? throw new InvalidFileException();
 
             try
             {
@@ -223,84 +217,113 @@ namespace System.Drawing.IconLib
             }
         }
 
-        public void CreateFrom(Bitmap bitmap) => CreateFrom(bitmap, IconOutputFormat.FromWin95);
+        public void CreateFrom(in Bitmap bitmap) => CreateFrom(bitmap, IconOutputFormat.FromWin95);
 
-        public void CreateFrom(Bitmap bitmap, IconOutputFormat format)
+        public void CreateFrom(in Bitmap bitmap, in IconOutputFormat format)
         {
+            if ((bitmap ?? throw GetArgumentNullException(nameof(bitmap))).PixelFormat != PixelFormat.Format32bppArgb)
+
+                throw new InvalidPixelFormatException(PixelFormat.Undefined, PixelFormat.Format32bppArgb);
+
             Bitmap bmp;
             IconImage iconImage = null;
             IColorQuantizer colorQuantizer = new EuclideanQuantizer();
-
-            if (bitmap.PixelFormat != PixelFormat.Format32bppArgb)
-                throw new InvalidPixelFormatException(PixelFormat.Undefined, PixelFormat.Format32bppArgb);
 
             mIconImages.Clear();
 
             // Vista
             // 256x256x32
             if ((format & IconOutputFormat.Vista) == IconOutputFormat.Vista)
-                Add(bitmap);
+
+                _ = Add(bitmap);
 
             if ((format & IconOutputFormat.WinXPUnpopular) == IconOutputFormat.WinXPUnpopular)
 
                 using (bmp = new Bitmap(bitmap, 64, 64))
+
                     iconImage = Add(bmp); // XP
 
             using (bmp = new Bitmap(bitmap, 48, 48))
             {
                 if ((format & IconOutputFormat.WinXP) == IconOutputFormat.WinXP)
+
                     iconImage = Add(bmp); // XP
+
                 if ((format & IconOutputFormat.Win95) == IconOutputFormat.Win95)
-                    Add(colorQuantizer.Convert(bmp, PixelFormat.Format8bppIndexed), iconImage.Mask); // W95
+
+                    _ = Add(colorQuantizer.Convert(bmp, PixelFormat.Format8bppIndexed), iconImage.Mask); // W95
+
                 if ((format & IconOutputFormat.Win31) == IconOutputFormat.Win31)
-                    Add(colorQuantizer.Convert(bmp, PixelFormat.Format4bppIndexed), iconImage.Mask); // W95
+
+                    _ = Add(colorQuantizer.Convert(bmp, PixelFormat.Format4bppIndexed), iconImage.Mask); // W95
             }
 
             using (bmp = new Bitmap(bitmap, 32, 32))
             {
                 if ((format & IconOutputFormat.WinXP) == IconOutputFormat.WinXP)
+
                     iconImage = Add(bmp); // XP
+
                 if ((format & IconOutputFormat.Win95) == IconOutputFormat.Win95)
-                    Add(colorQuantizer.Convert(bmp, PixelFormat.Format8bppIndexed), iconImage.Mask); // W95
+
+                    _ = Add(colorQuantizer.Convert(bmp, PixelFormat.Format8bppIndexed), iconImage.Mask); // W95
+
                 if ((format & IconOutputFormat.Win31) == IconOutputFormat.Win31)
-                    Add(colorQuantizer.Convert(bmp, PixelFormat.Format4bppIndexed), iconImage.Mask); // W31
+
+                    _ = Add(colorQuantizer.Convert(bmp, PixelFormat.Format4bppIndexed), iconImage.Mask); // W31
+
                 if ((format & IconOutputFormat.Win30) == IconOutputFormat.Win30)
-                    Add(colorQuantizer.Convert(bmp, PixelFormat.Format1bppIndexed), iconImage.Mask); // W30
+
+                    _ = Add(colorQuantizer.Convert(bmp, PixelFormat.Format1bppIndexed), iconImage.Mask); // W30
             }
 
             using (bmp = new Bitmap(bitmap, 24, 24))
             {
                 if ((format & IconOutputFormat.WinXPUnpopular) == IconOutputFormat.WinXPUnpopular)
+
                     iconImage = Add(bmp); // XP
+
                 if ((format & IconOutputFormat.Win95Unpopular) == IconOutputFormat.Win95Unpopular)
-                    Add(colorQuantizer.Convert(bmp, PixelFormat.Format8bppIndexed), iconImage.Mask); // W95
+
+                    _ = Add(colorQuantizer.Convert(bmp, PixelFormat.Format8bppIndexed), iconImage.Mask); // W95
+
                 if ((format & IconOutputFormat.Win31Unpopular) == IconOutputFormat.Win31Unpopular)
-                    Add(colorQuantizer.Convert(bmp, PixelFormat.Format4bppIndexed), iconImage.Mask); // W31
+
+                    _ = Add(colorQuantizer.Convert(bmp, PixelFormat.Format4bppIndexed), iconImage.Mask); // W31
+
                 if ((format & IconOutputFormat.Win30) == IconOutputFormat.Win30)
-                    Add(colorQuantizer.Convert(bmp, PixelFormat.Format1bppIndexed), iconImage.Mask); // W30
+
+                    _ = Add(colorQuantizer.Convert(bmp, PixelFormat.Format1bppIndexed), iconImage.Mask); // W30
             }
 
             using (bmp = new Bitmap(bitmap, 16, 16))
             {
                 if ((format & IconOutputFormat.WinXP) == IconOutputFormat.WinXP)
+
                     iconImage = Add(bmp); // XP
+
                 if ((format & IconOutputFormat.Win95) == IconOutputFormat.Win95)
-                    Add(colorQuantizer.Convert(bmp, PixelFormat.Format8bppIndexed), iconImage.Mask); // W95
+
+                    _ = Add(colorQuantizer.Convert(bmp, PixelFormat.Format8bppIndexed), iconImage.Mask); // W95
+
                 if ((format & IconOutputFormat.Win31) == IconOutputFormat.Win31)
-                    Add(colorQuantizer.Convert(bmp, PixelFormat.Format4bppIndexed), iconImage.Mask); // W31
+
+                    _ = Add(colorQuantizer.Convert(bmp, PixelFormat.Format4bppIndexed), iconImage.Mask); // W31
+
                 if ((format & IconOutputFormat.Win30) == IconOutputFormat.Win30)
-                    Add(colorQuantizer.Convert(bmp, PixelFormat.Format1bppIndexed), iconImage.Mask); // W30
+
+                    _ = Add(colorQuantizer.Convert(bmp, PixelFormat.Format1bppIndexed), iconImage.Mask); // W30
             }
         }
 
-        internal IconImage Add(IconImage iconImage)
+        internal IconImage Add(in IconImage iconImage)
         {
             mIconImages.Add(iconImage);
 
             return iconImage;
         }
 
-        internal void CopyFrom(SingleIcon singleIcon)
+        internal void CopyFrom(in SingleIcon singleIcon)
         {
             mName = singleIcon.mName;
             mIconImages = singleIcon.mIconImages;
@@ -308,29 +331,33 @@ namespace System.Drawing.IconLib
         #endregion
 
         #region Private Methods
-        private unsafe IconImage Add(Bitmap bitmap, Bitmap bitmapMask, Color transparentColor)
+        private unsafe IconImage Add(in Bitmap bitmap, in Bitmap bitmapMask, in Color transparentColor)
         {
-            if (bitmap == null)
-                throw new ArgumentNullException(nameof(bitmap));
+            if (IndexOf((bitmap ?? throw GetArgumentNullException(nameof(bitmap))).Size, Tools.BitsFromPixelFormat(bitmap.PixelFormat)) != -1)
 
-            if (IndexOf(bitmap.Size, Tools.BitsFromPixelFormat(bitmap.PixelFormat)) != -1)
                 throw new ImageAlreadyExistsException();
 
             if (bitmap.Width > 256 || bitmap.Height > 256)
+
                 throw new ImageTooBigException();
 
-            IconImage iconImage = new IconImage();
+            var iconImage = new IconImage();
+
             iconImage.Set(bitmap, bitmapMask, transparentColor);
+
             mIconImages.Add(iconImage);
 
             return iconImage;
         }
 
-        private int IndexOf(Size size, int bitCount)
+        private int IndexOf(in Size size, in int bitCount)
         {
             for (int i = 0; i < Count; i++)
+
                 if (this[i].Size == size && Tools.BitsFromPixelFormat(this[i].PixelFormat) == bitCount)
+
                     return i;
+
             return -1;
         }
 
@@ -342,7 +369,7 @@ namespace System.Drawing.IconLib
         #endregion
 
         #region Indexers
-        public IconImage this[int index] => mIconImages[index];
+        public IconImage this[in int index] => mIconImages[index];
         #endregion
 
         #region Helper Classes
@@ -368,9 +395,7 @@ namespace System.Drawing.IconLib
             #endregion
 
             #region Methods
-            public void Dispose()
-            {
-            }
+            public void Dispose() { }
 
             public bool MoveNext()
             {
@@ -380,6 +405,7 @@ namespace System.Drawing.IconLib
                     mIndex++;
                     return true;
                 }
+
                 mIndex = mList.Count + 1;
                 Current = null;
                 return false;

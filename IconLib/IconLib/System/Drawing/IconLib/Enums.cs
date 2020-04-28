@@ -50,7 +50,7 @@ namespace System.Drawing.IconLib
 
 	#region LoadLibraryFlags
     [Author("Franco, Gustavo")]
-	internal enum LoadLibraryFlags
+	internal enum LoadLibraryFlags:uint
 	{
 		DONT_RESOLVE_DLL_REFERENCES    =  0x00000001,
 		LOAD_LIBRARY_AS_DATAFILE       =  0x00000002,
@@ -101,7 +101,7 @@ namespace System.Drawing.IconLib
 
     #region BitmapCompression
     [Author("Franco, Gustavo")]
-    public enum IconImageFormat : int
+    public enum IconImageFormat : ushort
     {
 	    //BI_RGB        = 0,
 	    //BI_RLE8       = 1,

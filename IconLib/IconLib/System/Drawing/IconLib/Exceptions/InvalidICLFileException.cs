@@ -23,9 +23,7 @@ namespace System.Drawing.IconLib.Exceptions
     public class InvalidICLFileException : Exception
     {
         #region Constructors
-        public InvalidICLFileException() : base ("Invalid ICL file.")
-        {
-        }
+        public InvalidICLFileException() : base("Invalid ICL file.") { }
         #endregion
     }
 }

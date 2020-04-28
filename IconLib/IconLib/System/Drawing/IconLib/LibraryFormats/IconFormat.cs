@@ -16,12 +16,11 @@
 //  IMPLIED WARRANTIES OF MERCHANTABILITY AND/OR FITNESS FOR A PARTICULAR
 //  PURPOSE. IT CAN BE DISTRIBUTED FREE OF CHARGE AS LONG AS THIS HEADER 
 //  REMAINS UNCHANGED.
-using System;
 using System.IO;
-using System.Text;
-using System.Collections.Generic;
 using System.Runtime.InteropServices;
 using System.Drawing.IconLib.Exceptions;
+using Microsoft.WindowsAPICodePack.Win32Native.GDI;
+using static System.Drawing.IconLib.Util;
 
 namespace System.Drawing.IconLib.EncodingFormats
 {
@@ -29,88 +28,88 @@ namespace System.Drawing.IconLib.EncodingFormats
     internal class IconFormat : ILibraryFormat
     {
         #region Methods
-        public bool IsRecognizedFormat(Stream stream)
+        public bool IsRecognizedFormat(in Stream stream)
         {
             stream.Position = 0;
+
             try
             {
-                ICONDIR iconDir = new ICONDIR(stream);
-                if (iconDir.idReserved != 0)
-                    return false;
+                var iconDir = new ICONDIR(stream);
 
-                if (iconDir.idType != 1)
-                    return false;
-
-                return true;
-
+                return iconDir.idReserved == 0 ? iconDir.idType == 1 : false;
             }
-            catch(Exception){}
+            catch (Exception) { }
+
             return false;
         }
 
-        public unsafe MultiIcon Load(Stream stream)
+        public unsafe MultiIcon Load(in Stream stream)
         {
             stream.Position = 0;
-            SingleIcon singleIcon = new SingleIcon("Untitled");
-            ICONDIR iconDir = new ICONDIR(stream);
+            var singleIcon = new SingleIcon("Untitled");
+            var iconDir = new ICONDIR(stream);
+
             if (iconDir.idReserved != 0 || iconDir.idType != 1)
+
                 throw new InvalidMultiIconFileException();
 
             int entryOffset = sizeof(ICONDIR);
 
             // Add Icon Images one by one to the new entry created
-            for(int i=0; i<iconDir.idCount; i++)
+            for (int i = 0; i < iconDir.idCount; i++)
             {
-                stream.Seek(entryOffset, SeekOrigin.Begin);
-                ICONDIRENTRY entry = new ICONDIRENTRY(stream);
+                _ = stream.Seek(entryOffset, SeekOrigin.Begin);
+                var entry = new ICONDIRENTRY(stream);
 
                 // If there is missing information in the header... lets try to calculate it
                 entry = CheckAndRepairEntry(entry);
 
-                stream.Seek(entry.dwImageOffset, SeekOrigin.Begin);
+                _ = stream.Seek(entry.dwImageOffset, SeekOrigin.Begin);
 
-                singleIcon.Add(new IconImage(stream, (int) (stream.Length - stream.Position)));
+                _ = singleIcon.Add(new IconImage(stream, (int)(stream.Length - stream.Position)));
                 entryOffset += sizeof(ICONDIRENTRY);
             }
 
             return new MultiIcon(singleIcon);
         }
 
-        public unsafe void Save(MultiIcon multiIcon, Stream stream)
+        public unsafe void Save(in MultiIcon multiIcon, in Stream stream)
         {
             if (multiIcon.SelectedIndex == -1)
+
                 return;
 
             SingleIcon singleIcon = multiIcon[multiIcon.SelectedIndex];
 
             // ICONDIR header
             ICONDIR iconDir = ICONDIR.Initalizated;
-            iconDir.idCount = (ushort) singleIcon.Count;
-            iconDir.Write(stream);
-            
+            iconDir.idCount = (ushort)singleIcon.Count;
+            Write(iconDir, stream);
+
             // ICONENTRIES
-            int entryPos    = sizeof(ICONDIR);
-            int imagesPos   = sizeof(ICONDIR) + iconDir.idCount * sizeof(ICONDIRENTRY);
-            foreach(IconImage iconImage in singleIcon)
+            int entryPos = sizeof(ICONDIR);
+            int imagesPos = sizeof(ICONDIR) + (iconDir.idCount * sizeof(ICONDIRENTRY));
+
+            foreach (IconImage iconImage in singleIcon)
             {
                 // for some formats We don't know the size until we write, 
                 // so we have to write first the image then later the header
-                
+
                 // IconImage
-                stream.Seek(imagesPos, SeekOrigin.Begin);
+                _ = stream.Seek(imagesPos, SeekOrigin.Begin);
                 iconImage.Write(stream);
                 long bytesInRes = stream.Position - imagesPos;
 
                 // IconDirHeader
-                stream.Seek(entryPos, SeekOrigin.Begin);
-                ICONDIRENTRY iconEntry  = iconImage.ICONDIRENTRY;
-                stream.Seek(entryPos, SeekOrigin.Begin);
-                iconEntry.dwImageOffset= (uint) imagesPos;
-                iconEntry.dwBytesInRes = (uint) bytesInRes; 
-                iconEntry.Write(stream);
+                _ = stream.Seek(entryPos, SeekOrigin.Begin);
+                ICONDIRENTRY iconEntry = iconImage.ICONDIRENTRY;
+                _ = stream.Seek(entryPos, SeekOrigin.Begin);
+                iconEntry.dwImageOffset = (uint)imagesPos;
+                iconEntry.dwBytesInRes = (uint)bytesInRes;
+                Write(iconEntry, stream);
 
-                entryPos    += sizeof(ICONDIRENTRY);
-                imagesPos   += (int) bytesInRes;
+                entryPos += sizeof(ICONDIRENTRY);
+                imagesPos += (int)bytesInRes;
             }
         }
         #endregion
@@ -121,32 +120,38 @@ namespace System.Drawing.IconLib.EncodingFormats
             // If there is missing information in the header... lets try to calculate it
             if (entry.wBitCount == 0)
             {
-                int stride, CLSSize, palette; 
-                int bmpSize  = ((ushort) entry.dwBytesInRes - sizeof(BITMAPINFOHEADER));
-                int BWStride = ((entry.bWidth * 1 + 31) & ~31) >> 3;
-                int BWSize   = BWStride * entry.bHeight;
-                bmpSize     -= BWSize;
-                
+                int stride, CLSSize, palette;
+                int bmpSize = (ushort)entry.dwBytesInRes - Marshal.SizeOf<BitmapInfoHeader>();
+                int BWStride = (((entry.bWidth * 1) + 31) & ~31) >> 3;
+                int BWSize = BWStride * entry.bHeight;
+                bmpSize -= BWSize;
+
                 // Lets find the value;
-                byte[] bpp = {1, 4, 8, 16, 24, 32};
-                int j=0;
-                while(j<=5)
+                byte[] bpp = { 1, 4, 8, 16, 24, 32 };
+                int j = 0;
+
+                while (j <= 5)
                 {
-                    stride   = ((entry.bWidth * bpp[j] + 31) & ~31) >> 3;
-                    CLSSize  = entry.bHeight * stride ;
-                    palette  = bpp[j]<=8 ? ((1 << bpp[j]) * 4) : 0;
+                    stride = (((entry.bWidth * bpp[j]) + 31) & ~31) >> 3;
+                    CLSSize = entry.bHeight * stride;
+                    palette = bpp[j] <= 8 ? ((1 << bpp[j]) * 4) : 0;
+
                     if (palette + CLSSize == bmpSize)
                     {
                         entry.wBitCount = bpp[j];
                         break;
                     }
+
                     j++;
                 }
             }
 
             if (entry.wBitCount < 8 && entry.bColorCount == 0)
-                entry.bColorCount = (byte) (1 << entry.wBitCount);
-            if (entry.wPlanes == 0) 
+
+                entry.bColorCount = (byte)(1 << entry.wBitCount);
+
+            if (entry.wPlanes == 0)
+
                 entry.wPlanes = 1;
 
             return entry;

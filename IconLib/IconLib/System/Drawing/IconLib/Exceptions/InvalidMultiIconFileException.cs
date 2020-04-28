@@ -22,9 +22,7 @@ namespace System.Drawing.IconLib.Exceptions
     public class InvalidMultiIconFileException : Exception
     {
         #region Constructors
-        public InvalidMultiIconFileException() : base ("Invalid icon file. Signature does not match")
-        {
-        }
+        public InvalidMultiIconFileException() : base("Invalid icon file. Signature does not match") { }
         #endregion
     }
 }

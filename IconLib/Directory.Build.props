@@ -1,42 +1,66 @@
 <Project ToolsVersion="15.0"  DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
-    <TargetFrameworks>net40;netstandard2.0</TargetFrameworks>
+    <TargetFrameworks>net472;netstandard2.0</TargetFrameworks>
     <RootNamespace>System.Drawing.IconLib</RootNamespace>
     <AssemblyName>IconLib</AssemblyName>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <DefineConstants Condition="'$(Platform)'=='x64'">x64;$(DefineConstants)</DefineConstants>
+    <DefineConstants Condition="'$(Platform)'=='x86'">x86;$(DefineConstants)</DefineConstants>
 
     <Company>Pierre Sprimont</Company>
 
     <VersionPrefix>0.74.4</VersionPrefix>
     <VersionSuffix>beta-2</VersionSuffix>
 
-    <PackageId>IconLib</PackageId>
+    <PackageId>WinCopies.IconLib</PackageId>
     <Title>IconLib</Title>
-    <Authors>Franco, Gustavo; CastorTiu; Pierre Sprimont</Authors>
-    <PackageLicenseUrl>https://github.com/pierresprim/IconLib/blob/master/LICENSE</PackageLicenseUrl>
-    <PackageProjectUrl>https://github.com/CZEMacLeod/IconLib</PackageProjectUrl>
+    <PackageProjectUrl>https://wincopies.com/fwd.php?id=7</PackageProjectUrl>
     <RepositoryType>git</RepositoryType>
-    <RepositoryUrl>https://github.com/CZEMacLeod/IconLib.git</RepositoryUrl>
     <PackageRequireLicenseAcceptance>true</PackageRequireLicenseAcceptance>
     <Description>Icon utilities to extract icons in different formats and sizes</Description>
     <PackageReleaseNotes>
-      System requirements:
-
-      .NET Framework version: 4.0
-      .NET Standard version: 2.0
-
-      OS: Windows (x86 or x64)
-
-      New in this version:
-
-      Package depends on SourceLink
-
-      Project link: https://github.com/CZEMacLeod/IconLib
-
-      License link: https://github.com/CZEMacLeod/IconLib/blob/master/LICENSE
+      See: https://wincopies.com/fwd.php?id=9
     </PackageReleaseNotes>
-    <Copyright>Copyright © Franco, Gustavo 2006, Copyright © 2008 CastorTiu, Copyright © 2019 Pierre Sprimont</Copyright>
+    <Copyright>Copyright © Franco, Gustavo 2006</Copyright>
     <PackageTags>Icons</PackageTags>
+    <DocumentationFile>IconLib.xml</DocumentationFile>
+    <PackageLicenseFile>LICENSE</PackageLicenseFile>
+    <RepositoryUrl>https://wincopies.com/fwd.php?id=7</RepositoryUrl>
 
   </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)'=='Debug'">
+    <DefineConstants>TRACE;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='net472'">
+    <DefineConstants>CS7;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.0'">
+    <DefineConstants>CS7;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework)'=='netstandard2.1'">
+    <DefineConstants>CS8;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Platform)'=='x64'">
+    <DefineConstants>WIN64;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework.TrimEnd(`0123456789.`))' == 'net'">
+    <DefineConstants>NETFRAMEWORK;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(TargetFramework.TrimEnd(`0123456789.`))' == 'netstandard'">
+    <DefineConstants>NETSTANDARD;$(DefineConstants)</DefineConstants>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Include="..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
+  </ItemGroup>
 </Project>

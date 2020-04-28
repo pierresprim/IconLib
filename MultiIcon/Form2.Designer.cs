@@ -1,4 +1,4 @@
-namespace MultiIconTester
+﻿namespace MultiIconTester
 {
     partial class Form2
     {
@@ -72,7 +72,9 @@ namespace MultiIconTester
             this.Controls.Add(this.label2);
             this.Controls.Add(this.linkLabel1);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+#if NETCORE
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+#endif
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "Form2";
@@ -82,7 +84,7 @@ namespace MultiIconTester
 
         }
 
-        #endregion
+#endregion
 
         private System.Windows.Forms.LinkLabel linkLabel1;
         private System.Windows.Forms.Label label2;

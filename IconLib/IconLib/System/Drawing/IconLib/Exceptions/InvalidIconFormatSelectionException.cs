@@ -22,9 +22,7 @@ namespace System.Drawing.IconLib.Exceptions
     public class InvalidIconFormatSelectionException : Exception
     {
         #region Constructors
-        public InvalidIconFormatSelectionException() : base ("Invalid IconImageFormat selection")
-        {
-        }
+        public InvalidIconFormatSelectionException() : base("Invalid IconImageFormat selection") { }
         #endregion
     }
 }
