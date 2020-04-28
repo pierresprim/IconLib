@@ -14,9 +14,7 @@
     <!-- Optional: Include the PDB in the built .nupkg -->
     <AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <PackageReleaseNotes>
-      See: https://wincopies.com/fwd.php?id=9
-</PackageReleaseNotes>
+    <PackageReleaseNotes>See: https://wincopies.com/fwd.php?id=9</PackageReleaseNotes>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" Condition="'$(TargetFramework)'=='net40'" />
@@ -53,5 +51,12 @@
     <PackageReference Include="System.Text.Encoding.CodePages" Version="4.6.0" />
     <PackageReference Include="System.Drawing.Common" Version="4.6.0">
     </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="..\..\LICENSE">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 </Project>

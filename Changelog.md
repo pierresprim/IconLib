@@ -7,9 +7,17 @@ Change log
 WinCopies.IconLib 0.74.4-beta2
 ------------------------------
 
-- Supports .Net Standard 2.0.
-- Depends on the WinCopies Windows API Code Pack.
-- Depends on SourceLink.
+- Supports:
+    - .Net Standard 2.0.
+    - .Net framework 4.7.2
+- Depends on:
+    - WinCopies.Util
+    - WinCopies.WindowsAPICodePack.Win32Native
+    - Depends on SourceLink
+
+- Depends on (.Net Standard only):
+    - System.Drawing.Common
+    - System.Encoding.Text.Pages
 
 IconLib 0.73 (01/31/2008)
 -------------------------

@@ -9,8 +9,8 @@
 
     <Company>Pierre Sprimont</Company>
 
-    <VersionPrefix>0.74.4</VersionPrefix>
-    <VersionSuffix>beta-2</VersionSuffix>
+    <VersionPrefix>0.75</VersionPrefix>
+    <VersionSuffix>rc</VersionSuffix>
 
     <PackageId>WinCopies.IconLib</PackageId>
     <Title>IconLib</Title>
@@ -56,11 +56,4 @@
   <PropertyGroup Condition="'$(TargetFramework.TrimEnd(`0123456789.`))' == 'netstandard'">
     <DefineConstants>NETSTANDARD;$(DefineConstants)</DefineConstants>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <None Include="..\LICENSE">
-      <Pack>True</Pack>
-      <PackagePath></PackagePath>
-    </None>
-  </ItemGroup>
 </Project>
