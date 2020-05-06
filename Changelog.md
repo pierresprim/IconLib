@@ -4,8 +4,8 @@ IconLib
 Change log
 ==========
 
-WinCopies.IconLib 0.75.0-rc
----------------------------
+WinCopies.IconLib 0.75.0-rc (04/28/2020)
+----------------------------------------
 
 - Supports:
     - .Net Standard 2.0.
