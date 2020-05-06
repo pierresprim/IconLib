@@ -4,8 +4,8 @@ IconLib
 Change log
 ==========
 
-WinCopies.IconLib 0.74.4-beta2
-------------------------------
+WinCopies.IconLib 0.75.0-rc
+---------------------------
 
 - Supports:
     - .Net Standard 2.0.
