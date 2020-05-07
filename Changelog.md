@@ -4,20 +4,25 @@ IconLib
 Change log
 ==========
 
-WinCopies.IconLib 0.74.4-beta2
-------------------------------
+WinCopies.IconLib 0.75-rc
+-------------------------
 
 - Supports:
     - .Net Standard 2.0.
     - .Net framework 4.7.2
+
 - Depends on:
     - WinCopies.Util
     - WinCopies.WindowsAPICodePack.Win32Native
-    - Depends on SourceLink
+    - SourceLink
 
 - Depends on (.Net Standard only):
     - System.Drawing.Common
     - System.Encoding.Text.Pages
+
+- Code changes:
+    - System.Drawing.IconLib.ColorProcessing.EuclideanQuantizer.Convert(Bitmap, PixelFormat) method throws WinCopies.Util.InvalidEnumArgumentException instead of ArgumentException.
+    - System.Drawing.IconLib.ColorProcessing.OctreeQuantizer.CreatePalette(Bitmap, int, int) method throws ArgumentOutOfRangeException instead of ArgumentException.
 
 IconLib 0.73 (01/31/2008)
 -------------------------

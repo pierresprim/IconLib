@@ -17,6 +17,7 @@
     <PackageReleaseNotes>
       See: https://wincopies.com/fwd.php?id=9
 </PackageReleaseNotes>
+    <ApplicationIcon>video.ico</ApplicationIcon>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(TargetFramework.TrimEnd(`0123456789.`))' == 'netcoreapp'">
